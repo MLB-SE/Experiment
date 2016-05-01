@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testplgndr
+symbolic.method = plgndr.plgndr(sym#sym#sym);

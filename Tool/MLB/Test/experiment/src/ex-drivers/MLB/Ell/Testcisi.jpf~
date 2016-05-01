@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = TestCisi
+symbolic.method = cisi.cisi(sym);

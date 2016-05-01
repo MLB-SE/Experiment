@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testdawson
+symbolic.method = dawson.probks(sym);

@@ -1,0 +1,9 @@
+<project>
+ <property name="gentestdir" location="${gen.dir}/MLB" />
+  <property name="jpf.arguments" value="+symbolic.dp=CSP
+					+symbolic.mltype=two
+					+symbolic.mlpm=3000
+					+symbolic.complex=2
+					+symbolic.strategy=conservative
+" />
+</project>

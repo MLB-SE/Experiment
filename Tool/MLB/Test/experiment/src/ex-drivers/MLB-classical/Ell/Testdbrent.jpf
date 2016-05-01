@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testell
+symbolic.method = ell.dbrent(sym#sym#sym#sym);

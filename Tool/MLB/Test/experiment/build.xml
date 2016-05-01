@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+-->
+
+<project name="Coverage Evaluation"
+	 default="rebuild"
+	 xmlns:jacoco="antlib:org.jacoco.ant">
+  
+  <property name="project.dir" location=".." />
+  <property name="experiments.dir" location="." />
+
+  <property name="src.dir" location="./src" />
+  <property name="src.programs.dir" location="${src.dir}/programs" />
+  <property name="src.programs-ex.dir" location="${src.dir}/ex-programs" />
+  <property name="src.drivers.dir" location="${src.dir}/drivers" />
+  <property name="src.drivers-ex.dir" location="${src.dir}/ex-drivers" />
+
+  <property name="gen.dir" location="./gen" />
+  <property name="gen.timeout" value="30" />
+
+  <property name="res.dir" location="./res" />
+
+  <property name="build.dir" location="./build" />
+  <property name="build.programs.dir" location="${build.dir}/programs" />
+  <property name="build.drivers.dir" location="${build.dir}/drivers" />
+  <property name="build.tests.dir" location="${build.dir}/tests" />
+
+  <property name="report.dir" location="./coverage" />
+
+  <property name="log.file" location="build.log" />
+  <record name="${log.file}" action="start" append="yes" />
+
+<!--tools & library -->
+  <property name="tool.jacoco.dir"
+	    location="${project.dir}/tools/jacoco" />
+  <property name="tool.jpf-core.dir"
+	    location="${project.dir}/../jpf-core" />
+  <property name="tool.jpf-symbc.dir"
+	    location="${project.dir}/../jpf-symbc" />
+  <property name="tool.junit.dir"
+	    location="${project.dir}/tools/junit" />
+
+  <path id="classpath.jacoco">
+  	 <pathelement path="${tool.jacoco.dir}/lib/jacocoant.jar" />
+  </path>
+
+  <path id="classpath.junit4">
+    <pathelement location="${tool.junit.dir}/junit-4.11.jar" />
+    <pathelement location="${tool.junit.dir}/hamcrest-core-1.3.jar" />
+  </path>
+
+
+  <taskdef uri="antlib:org.jacoco.ant"
+	   resource="org/jacoco/ant/antlib.xml"
+	   classpathref="classpath.jacoco" />
+
+  <!-- Collection of paths used by sub-ant builds -->
+  <propertyset id="subant.arguments">
+    <propertyref name="src.programs.dir" />
+    <propertyref name="src.programs-ex.dir" />
+    <propertyref name="build.programs.dir" />
+    <propertyref name="build.drivers.dir" />
+
+    <propertyref name="build.tests.dir" />
+ <propertyref name="gendir.tests.f" />
+ <propertyref name="classdir.tests.f" />
+ <propertyref name="classdir.drivers.f" />
+
+
+
+
+    <propertyref name="gen.dir" />
+    <propertyref name="gen.timeout" />
+
+    <propertyref name="res.dir" />
+
+    <propertyref name="project.dir" />
+    <propertyref name="experiments.dir" />
+
+
+    <propertyref name="tool.jacoco.dir" />
+    <propertyref name="tool.jpf-core.dir" />
+    <propertyref name="tool.jpf-symbc.dir" />
+  </propertyset>
+
+  <!--
+      Compile Programs
+  -->
+  <target name="compile-programs">
+    <subant target="compile">
+      <propertyset refid="subant.arguments" />
+      <fileset dir="${src.programs.dir}" includes="**/build.xml" />
+    </subant>
+  </target>
+
+  <target name="compile-programs-ex">
+    <subant target="compile">
+      <propertyset refid="subant.arguments" />
+      <fileset dir="${src.programs-ex.dir}" includes="**/build.xml" />
+    </subant>
+  </target>
+
+  <macrodef name="foreach-program-driver-set">
+    <attribute name="tool" />
+    <attribute name="target" />
+    <sequential>
+      <subant target="@{target}">
+	<propertyset refid="subant.arguments" />
+	<reference refid="classpath.jacoco" />
+	<fileset dir="${src.drivers.dir}/@{tool}"
+		 includes="**/build.xml" />
+      </subant>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="foreach-program-ex-driver-set">
+    <attribute name="tool" />
+    <attribute name="target" />
+    <sequential>
+      <subant target="@{target}">
+	<propertyset refid="subant.arguments" />
+	<reference refid="classpath.jacoco" />
+	<fileset dir="${src.drivers-ex.dir}/@{tool}"
+		 includes="**/build.xml" />
+      </subant>
+    </sequential>
+  </macrodef>
+
+  <target name="compile-drivers"
+	  depends="compile-drivers-jpf-MLB,
+		   compile-drivers-jpf-MLB-ex,
+		   compile-drivers-jpf-MLB-conservative,
+		   compile-drivers-jpf-MLB-classical,
+		   compile-drivers-jpf-MLB-whitebox,
+		   compile-drivers-jpf-MLB-blackbox,
+		   compile-drivers-jpf-MLB-samplesize" />
+
+  <target name="compile-drivers-jpf-MLB" depends="compile-programs">
+    <foreach-program-driver-set tool="MLB" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-ex" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-conservative" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-conservative" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-classical" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-classical" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-whitebox" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-whitebox" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-blackbox" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-blackbox" target="compile-drivers" />
+  </target>
+
+  <target name="compile-drivers-jpf-MLB-samplesize" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-samplesize" target="compile-drivers" />
+  </target>
+  <!--
+      Test Generation
+  -->
+	<target name="generate-tests" 
+		depends="generate-tests-jpf-MLB,
+			 generate-tests-jpf-MLB-ex,
+			 generate-tests-jpf-MLB-conservative,
+			 generate-tests-jpf-MLB-classical,
+			 generate-tests-jpf-MLB-whitebox,
+			 generate-tests-jpf-MLB-blackbox,
+			 generate-tests-jpf-MLB-samplesize"/>
+	
+	<target name="generate-tests-jpf-MLB" depends="compile-drivers-jpf-MLB">
+		<foreach-program-driver-set tool="MLB" target="generate-tests"/>
+	</target>
+	
+	<target name="generate-tests-jpf-MLB-ex" depends="compile-drivers-jpf-MLB-ex">
+		<foreach-program-ex-driver-set tool="MLB" target="generate-tests"/>
+	</target>
+
+	<target name="generate-tests-jpf-MLB-conservative" depends="compile-drivers-jpf-MLB-conservative">
+		<foreach-program-ex-driver-set tool="MLB-conservative" target="generate-tests"/>
+	</target>
+
+	<target name="generate-tests-jpf-MLB-classical" depends="compile-drivers-jpf-MLB-classical">
+		<foreach-program-ex-driver-set tool="MLB-classical" target="generate-tests"/>
+	</target>
+
+	<target name="generate-tests-jpf-MLB-samplesize" depends="compile-drivers-jpf-MLB-samplesize">
+		<foreach-program-ex-driver-set tool="MLB-samplesize" target="generate-tests"/>
+	</target>
+
+	<target name="generate-tests-jpf-MLB-whitebox" depends="compile-drivers-jpf-MLB-whitebox">
+		<foreach-program-ex-driver-set tool="MLB-whitebox" target="generate-tests"/>
+	</target>
+	<target name="generate-tests-jpf-MLB-blackbox" depends="compile-drivers-jpf-MLB-blackbox">
+		<foreach-program-ex-driver-set tool="MLB-blackbox" target="generate-tests"/>
+	</target>
+
+
+  <!--
+      Test Compilation
+  -->
+
+  <!--
+    Invokes 'ant -buildfile @{antFile} @{target}' for every entry in
+    the @{dir} directory.  (Used to invoke ant on all sub-directories
+    in a given @{dir}.)
+  -->
+  <macrodef name="foreach-program">
+    <attribute name="dir" />
+    <attribute name="antFile" />
+    <attribute name="target" />
+    <sequential>
+      <subant genericAntFile="@{antFile}" target="@{target}">
+	<propertyset refid="subant.arguments" />
+	<reference refid="classpath.jacoco" />
+	<reference refid="classpath.junit4" />
+	<dirset dir="@{dir}" includes="*" />
+      </subant>
+    </sequential>
+  </macrodef>
+
+  <target name="compile-tests"
+	  depends="compile-tests-jpf-MLB,
+		   compile-tests-jpf-MLB-ex,
+			 compile-tests-jpf-MLB-conservative,
+			 compile-tests-jpf-MLB-classical,
+			 compile-tests-jpf-MLB-whitebox,
+			 compile-tests-jpf-MLB-blackbox,
+			 compile-tests-jpf-MLB-samplesize" />
+
+
+  <target name="compile-tests-jpf-MLB">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-ex">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-conservative">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-classical">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-whitebox">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-blackbox">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+  <target name="compile-tests-jpf-MLB-samplesize">
+    <foreach-program dir="${gen.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="compile-tests" />
+  </target>
+
+
+  <!--
+      Data Collection
+  -->
+  <target name="run-tests"
+	  depends="run-tests-jpf-MLB,
+	  	   run-tests-jpf-MLB-ex,
+			 run-tests-jpf-MLB-conservative,
+			 run-tests-jpf-MLB-classical,
+			 run-tests-jpf-MLB-whitebox,
+			 run-tests-jpf-MLB-blackbox,
+			 run-tests-jpf-MLB-samplesize" />
+
+  <target name="run-tests-jpf-MLB" depends="compile-tests-jpf-MLB">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-ex" depends="compile-tests-jpf-MLB-ex">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-conservative" depends="compile-tests-jpf-MLB-conservative">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-classical" depends="compile-tests-jpf-MLB-classical">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-whitebox" depends="compile-tests-jpf-MLB-whitebox">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-blackbox" depends="compile-tests-jpf-MLB-blackbox">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+
+  <target name="run-tests-jpf-MLB-samplesize" depends="compile-tests-jpf-MLB-samplesize">
+    <foreach-program dir="${build.tests.dir}/MLB"
+		     antFile="common-jpf-ex.xml"
+		     target="run-tests" />
+  </target>
+ 
+  <!--
+      Report Generation
+  -->
+  <target name="report">
+    <property name="jacoco.antfile"
+	      value="${build.dir}/jacoco-run-reports.xml" />
+
+    <exec executable="bash">
+      <arg value="make-report-tasks.sh" />
+      <arg value="${build.tests.dir}" />
+      <arg value="${jacoco.antfile}" />
+    </exec>
+
+    <ant antfile="${jacoco.antfile}">
+      <reference refid="classpath.jacoco" />
+      <propertyset refid="subant.arguments" />
+    </ant>
+  </target>
+
+  <target name="report-ex">
+    <property name="jacoco.antfile"
+	      value="${build.dir}/jacoco-run-reports.xml" />
+
+    <exec executable="bash">
+      <arg value="make-report-tasks-ex.sh" />
+      <arg value="${build.tests.dir}" />
+      <arg value="${jacoco.antfile}" />
+    </exec>
+
+    <ant antfile="${jacoco.antfile}">
+      <reference refid="classpath.jacoco" />
+      <propertyset refid="subant.arguments" />
+    </ant>
+  </target>
+
+  <target name="cumulative-report">
+    <property name="jacoco.antfile"
+	      value="${build.dir}/jacoco-cumulative-reports.xml" />
+
+    <exec executable="bash">
+      <arg value="make-report-tasks.sh" />
+      <arg value="--cumulative" />
+      <arg value="${build.tests.dir}" />
+      <arg value="${jacoco.antfile}" />
+    </exec>
+
+    <ant antfile="${jacoco.antfile}">
+      <reference refid="classpath.jacoco" />
+      <propertyset refid="subant.arguments" />
+    </ant>
+  </target>
+
+
+
+
+
+
+
+
+  <!--
+      Generic Targets
+  -->
+  <target name="clean">
+    <delete dir="${build.dir}" />
+  </target>
+
+  <target name="clean-all" depends="clean">
+    <delete dir="${gen.dir}" />
+    <delete dir="${report.dir}" />
+    <delete file="${log.file}" />
+  </target>
+	
+ <target name="rebuild" depends="clean-all,generate-tests,run-tests,report" />
+</project>
+
+

@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testexpint
+symbolic.method = erf.ei(sym);

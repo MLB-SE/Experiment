@@ -1,0 +1,10 @@
+
+
+public class Testbess {
+	public static void main(String[] main){
+		bess.bessi(0,0.0);
+		bess.bessk(0,0.0);
+		bess.bessj(0,0.0);
+		bess.bessy(0,0.0);
+	}
+}

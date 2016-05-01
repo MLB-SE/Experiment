@@ -1,0 +1,4 @@
+<project default="generate-tests">
+  <import file="../../../arguments-MLB.xml"/>
+  <import file="../../../common-jpf.xml"/>
+</project>

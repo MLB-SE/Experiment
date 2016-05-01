@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testsphbes
+symbolic.method = sphbes.sphbes(sym#sym)

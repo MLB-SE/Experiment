@@ -1,0 +1,8 @@
+
+
+public class Testerf {
+	public static void main(String[] main){
+		erf.erfcc(1.0);
+		erf.ei(1.0);
+	}
+}

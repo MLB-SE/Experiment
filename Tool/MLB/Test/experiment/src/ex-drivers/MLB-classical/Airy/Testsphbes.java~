@@ -1,0 +1,7 @@
+//package airy;
+
+public class TestAiry {
+	public static void main(String[] main){
+		airy.sphbes(1,1.0);
+	}
+}

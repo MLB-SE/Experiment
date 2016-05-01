@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testran
+symbolic.method = ran.ran2(sym);

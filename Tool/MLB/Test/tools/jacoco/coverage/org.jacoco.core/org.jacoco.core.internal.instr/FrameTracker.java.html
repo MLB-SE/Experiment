@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../.resources/report.gif" type="image/gif"/><title>FrameTracker.java</title><link rel="stylesheet" href="../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../.sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">JaCoCo</a> &gt; <a href="../index.html" class="el_bundle">org.jacoco.core</a> &gt; <a href="index.source.html" class="el_package">org.jacoco.core.internal.instr</a> &gt; <span class="el_source">FrameTracker.java</span></div><h1>FrameTracker.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright (c) 2009, 2013 Mountainminds GmbH &amp; Co. KG and Contributors
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Marc R. Hoffmann - initial API and implementation
+ *    
+ *******************************************************************************/
+package org.jacoco.core.internal.instr;
+
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+
+/**
+ * This method adapter tracks the state of the local variable and stack types.
+ * With insertFrame() additional frames can then be added. The adapter is only
+ * intended to be used with class file versions &gt;= {@link Opcodes#V1_6}.
+ */
+class FrameTracker extends MethodVisitor implements IFrameInserter {
+
+	private final String owner;
+
+	private Object[] local;
+	private int localSize;
+	private Object[] stack;
+	private int stackSize;
+
+	public FrameTracker(final String owner, final int access,
+			final String name, final String desc, final MethodVisitor mv) {
+<span class="fc" id="L36">		super(Opcodes.ASM4, mv);</span>
+<span class="fc" id="L37">		this.owner = owner;</span>
+<span class="fc" id="L38">		local = new Object[8];</span>
+<span class="fc" id="L39">		localSize = 0;</span>
+<span class="fc" id="L40">		stack = new Object[8];</span>
+<span class="fc" id="L41">		stackSize = 0;</span>
+
+<span class="fc bfc" id="L43" title="All 2 branches covered.">		if ((access &amp; Opcodes.ACC_STATIC) == 0) {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">			if (&quot;&lt;init&gt;&quot;.equals(name)) {</span>
+<span class="fc" id="L45">				set(localSize, Opcodes.UNINITIALIZED_THIS);</span>
+			} else {
+<span class="fc" id="L47">				set(localSize, owner);</span>
+			}
+		}
+<span class="fc bfc" id="L50" title="All 2 branches covered.">		for (final Type t : Type.getArgumentTypes(desc)) {</span>
+<span class="fc" id="L51">			set(localSize, t);</span>
+		}
+
+<span class="fc" id="L54">	}</span>
+
+	public void insertFrame() {
+		// Reduced types do not need more space than expanded types:
+<span class="fc" id="L58">		final Object[] local = new Object[this.localSize];</span>
+<span class="fc" id="L59">		final Object[] stack = new Object[this.stackSize];</span>
+<span class="fc" id="L60">		final int localSize = reduce(this.local, this.localSize, local);</span>
+<span class="fc" id="L61">		final int stackSize = reduce(this.stack, this.stackSize, stack);</span>
+<span class="fc" id="L62">		mv.visitFrame(Opcodes.F_NEW, localSize, local, stackSize, stack);</span>
+<span class="fc" id="L63">	}</span>
+
+	@Override
+	public void visitFrame(final int type, final int nLocal,
+			final Object[] local, final int nStack, final Object[] stack) {
+
+<span class="fc bfc" id="L69" title="All 2 branches covered.">		if (type != Opcodes.F_NEW) {</span>
+<span class="fc" id="L70">			throw new IllegalArgumentException(</span>
+					&quot;ClassReader.accept() should be called with EXPAND_FRAMES flag&quot;);
+		}
+
+		// expanded types need at most twice the size
+<span class="fc" id="L75">		this.local = ensureSize(this.local, nLocal * 2);</span>
+<span class="fc" id="L76">		this.stack = ensureSize(this.stack, nStack * 2);</span>
+<span class="fc" id="L77">		this.localSize = expand(local, nLocal, this.local);</span>
+<span class="fc" id="L78">		this.stackSize = expand(stack, nStack, this.stack);</span>
+
+<span class="fc" id="L80">		mv.visitFrame(type, nLocal, local, nStack, stack);</span>
+<span class="fc" id="L81">	}</span>
+
+	@Override
+	public void visitInsn(final int opcode) {
+		final Object t1, t2, t3, t4;
+<span class="fc bfc" id="L86" title="All 31 branches covered.">		switch (opcode) {</span>
+		case Opcodes.NOP:
+		case Opcodes.RETURN:
+<span class="fc" id="L89">			break;</span>
+		case Opcodes.ARETURN:
+		case Opcodes.ATHROW:
+		case Opcodes.FRETURN:
+		case Opcodes.IRETURN:
+		case Opcodes.MONITORENTER:
+		case Opcodes.MONITOREXIT:
+		case Opcodes.POP:
+<span class="fc" id="L97">			pop(1);</span>
+<span class="fc" id="L98">			break;</span>
+		case Opcodes.DRETURN:
+		case Opcodes.LRETURN:
+		case Opcodes.POP2:
+<span class="fc" id="L102">			pop(2);</span>
+<span class="fc" id="L103">			break;</span>
+		case Opcodes.AASTORE:
+		case Opcodes.BASTORE:
+		case Opcodes.CASTORE:
+		case Opcodes.FASTORE:
+		case Opcodes.IASTORE:
+		case Opcodes.SASTORE:
+<span class="fc" id="L110">			pop(3);</span>
+<span class="fc" id="L111">			break;</span>
+		case Opcodes.LASTORE:
+		case Opcodes.DASTORE:
+<span class="fc" id="L114">			pop(4);</span>
+<span class="fc" id="L115">			break;</span>
+		case Opcodes.ICONST_M1:
+		case Opcodes.ICONST_0:
+		case Opcodes.ICONST_1:
+		case Opcodes.ICONST_2:
+		case Opcodes.ICONST_3:
+		case Opcodes.ICONST_4:
+		case Opcodes.ICONST_5:
+<span class="fc" id="L123">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L124">			break;</span>
+		case Opcodes.ARRAYLENGTH:
+		case Opcodes.F2I:
+		case Opcodes.I2B:
+		case Opcodes.I2C:
+		case Opcodes.I2S:
+		case Opcodes.INEG:
+<span class="fc" id="L131">			pop(1);</span>
+<span class="fc" id="L132">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L133">			break;</span>
+		case Opcodes.BALOAD:
+		case Opcodes.CALOAD:
+		case Opcodes.D2I:
+		case Opcodes.FCMPG:
+		case Opcodes.FCMPL:
+		case Opcodes.IADD:
+		case Opcodes.IALOAD:
+		case Opcodes.IAND:
+		case Opcodes.IDIV:
+		case Opcodes.IMUL:
+		case Opcodes.IOR:
+		case Opcodes.IREM:
+		case Opcodes.ISHL:
+		case Opcodes.ISHR:
+		case Opcodes.ISUB:
+		case Opcodes.IUSHR:
+		case Opcodes.IXOR:
+		case Opcodes.L2I:
+		case Opcodes.SALOAD:
+<span class="fc" id="L153">			pop(2);</span>
+<span class="fc" id="L154">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L155">			break;</span>
+		case Opcodes.DCMPG:
+		case Opcodes.DCMPL:
+		case Opcodes.LCMP:
+<span class="fc" id="L159">			pop(4);</span>
+<span class="fc" id="L160">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L161">			break;</span>
+		case Opcodes.FCONST_0:
+		case Opcodes.FCONST_1:
+		case Opcodes.FCONST_2:
+<span class="fc" id="L165">			push(Opcodes.FLOAT);</span>
+<span class="fc" id="L166">			break;</span>
+		case Opcodes.FNEG:
+		case Opcodes.I2F:
+<span class="fc" id="L169">			pop(1);</span>
+<span class="fc" id="L170">			push(Opcodes.FLOAT);</span>
+<span class="fc" id="L171">			break;</span>
+		case Opcodes.D2F:
+		case Opcodes.FADD:
+		case Opcodes.FALOAD:
+		case Opcodes.FDIV:
+		case Opcodes.FMUL:
+		case Opcodes.FREM:
+		case Opcodes.FSUB:
+		case Opcodes.L2F:
+<span class="fc" id="L180">			pop(2);</span>
+<span class="fc" id="L181">			push(Opcodes.FLOAT);</span>
+<span class="fc" id="L182">			break;</span>
+		case Opcodes.LCONST_0:
+		case Opcodes.LCONST_1:
+<span class="fc" id="L185">			push(Opcodes.LONG);</span>
+<span class="fc" id="L186">			push(Opcodes.TOP);</span>
+<span class="fc" id="L187">			break;</span>
+		case Opcodes.F2L:
+		case Opcodes.I2L:
+<span class="fc" id="L190">			pop(1);</span>
+<span class="fc" id="L191">			push(Opcodes.LONG);</span>
+<span class="fc" id="L192">			push(Opcodes.TOP);</span>
+<span class="fc" id="L193">			break;</span>
+		case Opcodes.D2L:
+		case Opcodes.LALOAD:
+		case Opcodes.LNEG:
+<span class="fc" id="L197">			pop(2);</span>
+<span class="fc" id="L198">			push(Opcodes.LONG);</span>
+<span class="fc" id="L199">			push(Opcodes.TOP);</span>
+<span class="fc" id="L200">			break;</span>
+		case Opcodes.LSHL:
+		case Opcodes.LSHR:
+		case Opcodes.LUSHR:
+<span class="fc" id="L204">			pop(3);</span>
+<span class="fc" id="L205">			push(Opcodes.LONG);</span>
+<span class="fc" id="L206">			push(Opcodes.TOP);</span>
+<span class="fc" id="L207">			break;</span>
+		case Opcodes.LADD:
+		case Opcodes.LAND:
+		case Opcodes.LDIV:
+		case Opcodes.LMUL:
+		case Opcodes.LOR:
+		case Opcodes.LREM:
+		case Opcodes.LSUB:
+		case Opcodes.LXOR:
+<span class="fc" id="L216">			pop(4);</span>
+<span class="fc" id="L217">			push(Opcodes.LONG);</span>
+<span class="fc" id="L218">			push(Opcodes.TOP);</span>
+<span class="fc" id="L219">			break;</span>
+		case Opcodes.DCONST_0:
+		case Opcodes.DCONST_1:
+<span class="fc" id="L222">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L223">			push(Opcodes.TOP);</span>
+<span class="fc" id="L224">			break;</span>
+		case Opcodes.F2D:
+		case Opcodes.I2D:
+<span class="fc" id="L227">			pop(1);</span>
+<span class="fc" id="L228">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L229">			push(Opcodes.TOP);</span>
+<span class="fc" id="L230">			break;</span>
+		case Opcodes.DALOAD:
+		case Opcodes.DNEG:
+		case Opcodes.L2D:
+<span class="fc" id="L234">			pop(2);</span>
+<span class="fc" id="L235">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L236">			push(Opcodes.TOP);</span>
+<span class="fc" id="L237">			break;</span>
+		case Opcodes.DADD:
+		case Opcodes.DDIV:
+		case Opcodes.DMUL:
+		case Opcodes.DREM:
+		case Opcodes.DSUB:
+<span class="fc" id="L243">			pop(4);</span>
+<span class="fc" id="L244">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L245">			push(Opcodes.TOP);</span>
+<span class="fc" id="L246">			break;</span>
+		case Opcodes.ACONST_NULL:
+<span class="fc" id="L248">			push(Opcodes.NULL);</span>
+<span class="fc" id="L249">			break;</span>
+		case Opcodes.AALOAD:
+<span class="fc" id="L251">			pop(1);</span>
+<span class="fc" id="L252">			t1 = pop();</span>
+<span class="fc" id="L253">			push(Type.getType(((String) t1).substring(1)));</span>
+<span class="fc" id="L254">			break;</span>
+		case Opcodes.DUP:
+<span class="fc" id="L256">			t1 = pop();</span>
+<span class="fc" id="L257">			push(t1);</span>
+<span class="fc" id="L258">			push(t1);</span>
+<span class="fc" id="L259">			break;</span>
+		case Opcodes.DUP_X1:
+<span class="fc" id="L261">			t1 = pop();</span>
+<span class="fc" id="L262">			t2 = pop();</span>
+<span class="fc" id="L263">			push(t1);</span>
+<span class="fc" id="L264">			push(t2);</span>
+<span class="fc" id="L265">			push(t1);</span>
+<span class="fc" id="L266">			break;</span>
+		case Opcodes.DUP_X2:
+<span class="fc" id="L268">			t1 = pop();</span>
+<span class="fc" id="L269">			t2 = pop();</span>
+<span class="fc" id="L270">			t3 = pop();</span>
+<span class="fc" id="L271">			push(t1);</span>
+<span class="fc" id="L272">			push(t3);</span>
+<span class="fc" id="L273">			push(t2);</span>
+<span class="fc" id="L274">			push(t1);</span>
+<span class="fc" id="L275">			break;</span>
+		case Opcodes.DUP2:
+<span class="fc" id="L277">			t1 = pop();</span>
+<span class="fc" id="L278">			t2 = pop();</span>
+<span class="fc" id="L279">			push(t2);</span>
+<span class="fc" id="L280">			push(t1);</span>
+<span class="fc" id="L281">			push(t2);</span>
+<span class="fc" id="L282">			push(t1);</span>
+<span class="fc" id="L283">			break;</span>
+		case Opcodes.DUP2_X1:
+<span class="fc" id="L285">			t1 = pop();</span>
+<span class="fc" id="L286">			t2 = pop();</span>
+<span class="fc" id="L287">			t3 = pop();</span>
+<span class="fc" id="L288">			push(t2);</span>
+<span class="fc" id="L289">			push(t1);</span>
+<span class="fc" id="L290">			push(t3);</span>
+<span class="fc" id="L291">			push(t2);</span>
+<span class="fc" id="L292">			push(t1);</span>
+<span class="fc" id="L293">			break;</span>
+		case Opcodes.DUP2_X2:
+<span class="fc" id="L295">			t1 = pop();</span>
+<span class="fc" id="L296">			t2 = pop();</span>
+<span class="fc" id="L297">			t3 = pop();</span>
+<span class="fc" id="L298">			t4 = pop();</span>
+<span class="fc" id="L299">			push(t2);</span>
+<span class="fc" id="L300">			push(t1);</span>
+<span class="fc" id="L301">			push(t4);</span>
+<span class="fc" id="L302">			push(t3);</span>
+<span class="fc" id="L303">			push(t2);</span>
+<span class="fc" id="L304">			push(t1);</span>
+<span class="fc" id="L305">			break;</span>
+		case Opcodes.SWAP:
+<span class="fc" id="L307">			t1 = pop();</span>
+<span class="fc" id="L308">			t2 = pop();</span>
+<span class="fc" id="L309">			push(t1);</span>
+<span class="fc" id="L310">			push(t2);</span>
+<span class="fc" id="L311">			break;</span>
+		default:
+<span class="fc" id="L313">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L315">		mv.visitInsn(opcode);</span>
+<span class="fc" id="L316">	}</span>
+
+	@Override
+	public void visitIntInsn(final int opcode, final int operand) {
+<span class="fc bfc" id="L320" title="All 3 branches covered.">		switch (opcode) {</span>
+		case Opcodes.BIPUSH:
+		case Opcodes.SIPUSH:
+<span class="fc" id="L323">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L324">			break;</span>
+		case Opcodes.NEWARRAY:
+<span class="fc" id="L326">			pop(1);</span>
+<span class="fc bfc" id="L327" title="All 9 branches covered.">			switch (operand) {</span>
+			case Opcodes.T_BOOLEAN:
+<span class="fc" id="L329">				push(&quot;[Z&quot;);</span>
+<span class="fc" id="L330">				break;</span>
+			case Opcodes.T_CHAR:
+<span class="fc" id="L332">				push(&quot;[C&quot;);</span>
+<span class="fc" id="L333">				break;</span>
+			case Opcodes.T_FLOAT:
+<span class="fc" id="L335">				push(&quot;[F&quot;);</span>
+<span class="fc" id="L336">				break;</span>
+			case Opcodes.T_DOUBLE:
+<span class="fc" id="L338">				push(&quot;[D&quot;);</span>
+<span class="fc" id="L339">				break;</span>
+			case Opcodes.T_BYTE:
+<span class="fc" id="L341">				push(&quot;[B&quot;);</span>
+<span class="fc" id="L342">				break;</span>
+			case Opcodes.T_SHORT:
+<span class="fc" id="L344">				push(&quot;[S&quot;);</span>
+<span class="fc" id="L345">				break;</span>
+			case Opcodes.T_INT:
+<span class="fc" id="L347">				push(&quot;[I&quot;);</span>
+<span class="fc" id="L348">				break;</span>
+			case Opcodes.T_LONG:
+<span class="fc" id="L350">				push(&quot;[J&quot;);</span>
+<span class="fc" id="L351">				break;</span>
+			default:
+<span class="fc" id="L353">				throw new IllegalArgumentException();</span>
+			}
+			break;
+		default:
+<span class="fc" id="L357">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L359">		mv.visitIntInsn(opcode, operand);</span>
+<span class="fc" id="L360">	}</span>
+
+	@Override
+	public void visitVarInsn(final int opcode, final int var) {
+		final Object t;
+<span class="fc bfc" id="L365" title="All 8 branches covered.">		switch (opcode) {</span>
+		case Opcodes.ALOAD:
+<span class="fc" id="L367">			push(get(var));</span>
+<span class="fc" id="L368">			break;</span>
+		case Opcodes.ILOAD:
+<span class="fc" id="L370">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L371">			break;</span>
+		case Opcodes.FLOAD:
+<span class="fc" id="L373">			push(Opcodes.FLOAT);</span>
+<span class="fc" id="L374">			break;</span>
+		case Opcodes.LLOAD:
+<span class="fc" id="L376">			push(Opcodes.LONG);</span>
+<span class="fc" id="L377">			push(Opcodes.TOP);</span>
+<span class="fc" id="L378">			break;</span>
+		case Opcodes.DLOAD:
+<span class="fc" id="L380">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L381">			push(Opcodes.TOP);</span>
+<span class="fc" id="L382">			break;</span>
+		case Opcodes.ASTORE:
+		case Opcodes.ISTORE:
+		case Opcodes.FSTORE:
+<span class="fc" id="L386">			t = pop();</span>
+<span class="fc" id="L387">			set(var, t);</span>
+<span class="fc" id="L388">			break;</span>
+		case Opcodes.LSTORE:
+		case Opcodes.DSTORE:
+<span class="fc" id="L391">			pop(1);</span>
+<span class="fc" id="L392">			t = pop();</span>
+<span class="fc" id="L393">			set(var, t);</span>
+<span class="fc" id="L394">			set(var + 1, Opcodes.TOP);</span>
+<span class="fc" id="L395">			break;</span>
+		default:
+<span class="fc" id="L397">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L399">		mv.visitVarInsn(opcode, var);</span>
+<span class="fc" id="L400">	}</span>
+
+	@Override
+	public void visitTypeInsn(final int opcode, final String type) {
+<span class="fc bfc" id="L404" title="All 5 branches covered.">		switch (opcode) {</span>
+		case Opcodes.NEW:
+<span class="fc" id="L406">			final Label label = new Label();</span>
+<span class="fc" id="L407">			mv.visitLabel(label);</span>
+<span class="fc" id="L408">			push(label);</span>
+<span class="fc" id="L409">			break;</span>
+		case Opcodes.ANEWARRAY:
+<span class="fc" id="L411">			pop(1);</span>
+<span class="fc" id="L412">			push('[' + Type.getObjectType(type).getDescriptor());</span>
+<span class="fc" id="L413">			break;</span>
+		case Opcodes.CHECKCAST:
+<span class="fc" id="L415">			pop(1);</span>
+<span class="fc" id="L416">			push(type);</span>
+<span class="fc" id="L417">			break;</span>
+		case Opcodes.INSTANCEOF:
+<span class="fc" id="L419">			pop(1);</span>
+<span class="fc" id="L420">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L421">			break;</span>
+		default:
+<span class="fc" id="L423">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L425">		mv.visitTypeInsn(opcode, type);</span>
+<span class="fc" id="L426">	}</span>
+
+	@Override
+	public void visitFieldInsn(final int opcode, final String owner,
+			final String name, final String desc) {
+<span class="fc" id="L431">		final Type t = Type.getType(desc);</span>
+<span class="fc bfc" id="L432" title="All 5 branches covered.">		switch (opcode) {</span>
+		case Opcodes.PUTSTATIC:
+<span class="fc" id="L434">			pop(t);</span>
+<span class="fc" id="L435">			break;</span>
+		case Opcodes.PUTFIELD:
+<span class="fc" id="L437">			pop(t);</span>
+<span class="fc" id="L438">			pop(1);</span>
+<span class="fc" id="L439">			break;</span>
+		case Opcodes.GETSTATIC:
+<span class="fc" id="L441">			push(t);</span>
+<span class="fc" id="L442">			break;</span>
+		case Opcodes.GETFIELD:
+<span class="fc" id="L444">			pop(1);</span>
+<span class="fc" id="L445">			push(t);</span>
+<span class="fc" id="L446">			break;</span>
+		default:
+<span class="fc" id="L448">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L450">		mv.visitFieldInsn(opcode, owner, name, desc);</span>
+<span class="fc" id="L451">	}</span>
+
+	@Override
+	public void visitMethodInsn(final int opcode, final String owner,
+			final String name, final String desc) {
+<span class="fc bfc" id="L456" title="All 2 branches covered.">		for (final Type t : Type.getArgumentTypes(desc)) {</span>
+<span class="fc" id="L457">			pop(t);</span>
+		}
+<span class="fc bfc" id="L459" title="All 2 branches covered.">		if (opcode != Opcodes.INVOKESTATIC) {</span>
+<span class="fc" id="L460">			final Object target = pop();</span>
+<span class="fc bfc" id="L461" title="All 2 branches covered.">			if (target == Opcodes.UNINITIALIZED_THIS) {</span>
+<span class="fc" id="L462">				replace(Opcodes.UNINITIALIZED_THIS, this.owner);</span>
+<span class="fc bfc" id="L463" title="All 2 branches covered.">			} else if (target instanceof Label) {</span>
+<span class="fc" id="L464">				replace(target, owner);</span>
+			}
+		}
+<span class="fc" id="L467">		push(Type.getReturnType(desc));</span>
+
+<span class="fc" id="L469">		mv.visitMethodInsn(opcode, owner, name, desc);</span>
+<span class="fc" id="L470">	}</span>
+
+	@Override
+	public void visitInvokeDynamicInsn(final String name, final String desc,
+			final Handle bsm, final Object... bsmArgs) {
+<span class="fc bfc" id="L475" title="All 2 branches covered.">		for (final Type t : Type.getArgumentTypes(desc)) {</span>
+<span class="fc" id="L476">			pop(t);</span>
+		}
+<span class="fc" id="L478">		push(Type.getReturnType(desc));</span>
+
+<span class="fc" id="L480">		mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);</span>
+<span class="fc" id="L481">	}</span>
+
+	@Override
+	public void visitLdcInsn(final Object cst) {
+<span class="fc bfc" id="L485" title="All 2 branches covered.">		if (cst instanceof Integer) {</span>
+<span class="fc" id="L486">			push(Opcodes.INTEGER);</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">		} else if (cst instanceof Float) {</span>
+<span class="fc" id="L488">			push(Opcodes.FLOAT);</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">		} else if (cst instanceof Long) {</span>
+<span class="fc" id="L490">			push(Opcodes.LONG);</span>
+<span class="fc" id="L491">			push(Opcodes.TOP);</span>
+<span class="fc bfc" id="L492" title="All 2 branches covered.">		} else if (cst instanceof Double) {</span>
+<span class="fc" id="L493">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L494">			push(Opcodes.TOP);</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">		} else if (cst instanceof String) {</span>
+<span class="fc" id="L496">			push(&quot;java/lang/String&quot;);</span>
+<span class="fc bfc" id="L497" title="All 2 branches covered.">		} else if (cst instanceof Type) {</span>
+<span class="fc" id="L498">			push(&quot;java/lang/Class&quot;);</span>
+		} else {
+<span class="fc" id="L500">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L502">		mv.visitLdcInsn(cst);</span>
+<span class="fc" id="L503">	}</span>
+
+	@Override
+	public void visitJumpInsn(final int opcode, final Label label) {
+<span class="fc bfc" id="L507" title="All 4 branches covered.">		switch (opcode) {</span>
+		case Opcodes.GOTO:
+<span class="fc" id="L509">			break;</span>
+		case Opcodes.IFEQ:
+		case Opcodes.IFNE:
+		case Opcodes.IFLT:
+		case Opcodes.IFGE:
+		case Opcodes.IFGT:
+		case Opcodes.IFLE:
+		case Opcodes.IFNULL:
+		case Opcodes.IFNONNULL:
+<span class="fc" id="L518">			pop(1);</span>
+<span class="fc" id="L519">			break;</span>
+		case Opcodes.IF_ICMPEQ:
+		case Opcodes.IF_ICMPNE:
+		case Opcodes.IF_ICMPLT:
+		case Opcodes.IF_ICMPGE:
+		case Opcodes.IF_ICMPGT:
+		case Opcodes.IF_ICMPLE:
+		case Opcodes.IF_ACMPEQ:
+		case Opcodes.IF_ACMPNE:
+<span class="fc" id="L528">			pop(2);</span>
+<span class="fc" id="L529">			break;</span>
+		default:
+<span class="fc" id="L531">			throw new IllegalArgumentException();</span>
+		}
+<span class="fc" id="L533">		mv.visitJumpInsn(opcode, label);</span>
+<span class="fc" id="L534">	}</span>
+
+	@Override
+	public void visitIincInsn(final int var, final int increment) {
+<span class="fc" id="L538">		set(var, Opcodes.INTEGER);</span>
+<span class="fc" id="L539">		mv.visitIincInsn(var, increment);</span>
+<span class="fc" id="L540">	}</span>
+
+	@Override
+	public void visitTableSwitchInsn(final int min, final int max,
+			final Label dflt, final Label... labels) {
+<span class="fc" id="L545">		pop(1);</span>
+<span class="fc" id="L546">		mv.visitTableSwitchInsn(min, max, dflt, labels);</span>
+<span class="fc" id="L547">	}</span>
+
+	@Override
+	public void visitLookupSwitchInsn(final Label dflt, final int[] keys,
+			final Label[] labels) {
+<span class="fc" id="L552">		pop(1);</span>
+<span class="fc" id="L553">		mv.visitLookupSwitchInsn(dflt, keys, labels);</span>
+<span class="fc" id="L554">	}</span>
+
+	@Override
+	public void visitMultiANewArrayInsn(final String desc, final int dims) {
+<span class="fc" id="L558">		pop(dims);</span>
+<span class="fc" id="L559">		push(desc);</span>
+<span class="fc" id="L560">		mv.visitMultiANewArrayInsn(desc, dims);</span>
+<span class="fc" id="L561">	}</span>
+
+	private void push(final Object type) {
+<span class="fc" id="L564">		stack = ensureSize(stack, stackSize + 1);</span>
+<span class="fc" id="L565">		stack[stackSize] = type;</span>
+<span class="fc" id="L566">		stackSize++;</span>
+<span class="fc" id="L567">	}</span>
+
+	private void push(final Type type) {
+<span class="pc bpc" id="L570" title="1 of 7 branches missed.">		switch (type.getSort()) {</span>
+		case Type.VOID:
+<span class="fc" id="L572">			break;</span>
+		case Type.BOOLEAN:
+		case Type.BYTE:
+		case Type.CHAR:
+		case Type.INT:
+		case Type.SHORT:
+<span class="fc" id="L578">			push(Opcodes.INTEGER);</span>
+<span class="fc" id="L579">			break;</span>
+		case Type.FLOAT:
+<span class="fc" id="L581">			push(Opcodes.FLOAT);</span>
+<span class="fc" id="L582">			break;</span>
+		case Type.LONG:
+<span class="fc" id="L584">			push(Opcodes.LONG);</span>
+<span class="fc" id="L585">			push(Opcodes.TOP);</span>
+<span class="fc" id="L586">			break;</span>
+		case Type.DOUBLE:
+<span class="fc" id="L588">			push(Opcodes.DOUBLE);</span>
+<span class="fc" id="L589">			push(Opcodes.TOP);</span>
+<span class="fc" id="L590">			break;</span>
+		case Type.ARRAY:
+		case Type.OBJECT:
+<span class="fc" id="L593">			push(type.getInternalName());</span>
+<span class="fc" id="L594">			break;</span>
+		default:
+<span class="nc" id="L596">			throw new AssertionError(type);</span>
+		}
+<span class="fc" id="L598">	}</span>
+
+	private Object pop() {
+<span class="fc" id="L601">		stackSize--;</span>
+<span class="fc" id="L602">		assertValidFrames(stackSize);</span>
+<span class="fc" id="L603">		return stack[stackSize];</span>
+	}
+
+	private void pop(final int count) {
+<span class="fc" id="L607">		stackSize -= count;</span>
+<span class="fc" id="L608">		assertValidFrames(stackSize);</span>
+<span class="fc" id="L609">	}</span>
+
+	private void assertValidFrames(final int stackSize) {
+<span class="fc bfc" id="L612" title="All 2 branches covered.">		if (stackSize &lt; 0) {</span>
+<span class="fc" id="L613">			throw new IllegalStateException(</span>
+					&quot;Missing or invalid stackmap frames.&quot;);
+		}
+<span class="fc" id="L616">	}</span>
+
+	private void pop(final Type type) {
+<span class="fc" id="L619">		pop(type.getSize());</span>
+<span class="fc" id="L620">	}</span>
+
+	private void set(final int pos, final Object type) {
+<span class="fc" id="L623">		local = ensureSize(local, pos + 1);</span>
+		// fill gaps:
+<span class="fc bfc" id="L625" title="All 2 branches covered.">		for (int i = localSize; i &lt; pos; i++) {</span>
+<span class="fc" id="L626">			local[i] = Opcodes.TOP;</span>
+		}
+<span class="fc" id="L628">		localSize = Math.max(localSize, pos + 1);</span>
+<span class="fc" id="L629">		local[pos] = type;</span>
+<span class="fc" id="L630">	}</span>
+
+	private void set(final int pos, final Type type) {
+<span class="pc bpc" id="L633" title="1 of 6 branches missed.">		switch (type.getSort()) {</span>
+		case Type.BOOLEAN:
+		case Type.BYTE:
+		case Type.CHAR:
+		case Type.INT:
+		case Type.SHORT:
+<span class="fc" id="L639">			set(pos, Opcodes.INTEGER);</span>
+<span class="fc" id="L640">			break;</span>
+		case Type.FLOAT:
+<span class="fc" id="L642">			set(pos, Opcodes.FLOAT);</span>
+<span class="fc" id="L643">			break;</span>
+		case Type.LONG:
+<span class="fc" id="L645">			set(pos, Opcodes.LONG);</span>
+<span class="fc" id="L646">			set(pos + 1, Opcodes.TOP);</span>
+<span class="fc" id="L647">			break;</span>
+		case Type.DOUBLE:
+<span class="fc" id="L649">			set(pos, Opcodes.DOUBLE);</span>
+<span class="fc" id="L650">			set(pos + 1, Opcodes.TOP);</span>
+<span class="fc" id="L651">			break;</span>
+		case Type.ARRAY:
+		case Type.OBJECT:
+<span class="fc" id="L654">			set(pos, type.getInternalName());</span>
+<span class="fc" id="L655">			break;</span>
+		default:
+<span class="nc" id="L657">			throw new AssertionError(type);</span>
+		}
+<span class="fc" id="L659">	}</span>
+
+	private Object get(final int pos) {
+<span class="fc bfc" id="L662" title="All 2 branches covered.">		if (localSize &lt;= pos) {</span>
+<span class="fc" id="L663">			throw new IllegalStateException(</span>
+					&quot;Missing or invalid stackmap frames.&quot;);
+		}
+<span class="fc" id="L666">		return local[pos];</span>
+	}
+
+	private Object[] ensureSize(final Object[] array, final int size) {
+<span class="fc bfc" id="L670" title="All 2 branches covered.">		if (array.length &gt;= size) {</span>
+<span class="fc" id="L671">			return array;</span>
+		}
+<span class="fc" id="L673">		int newLength = array.length;</span>
+<span class="fc bfc" id="L674" title="All 2 branches covered.">		while (newLength &lt; size) {</span>
+<span class="fc" id="L675">			newLength *= 2;</span>
+		}
+<span class="fc" id="L677">		final Object[] newArray = new Object[newLength];</span>
+<span class="fc" id="L678">		System.arraycopy(array, 0, newArray, 0, array.length);</span>
+<span class="fc" id="L679">		return newArray;</span>
+	}
+
+	/**
+	 * Expand double word types into two slots.
+	 */
+	private int expand(final Object[] source, final int size,
+			final Object[] target) {
+<span class="fc" id="L687">		int targetIdx = 0;</span>
+<span class="fc bfc" id="L688" title="All 2 branches covered.">		for (int sourceIdx = 0; sourceIdx &lt; size; sourceIdx++) {</span>
+<span class="fc" id="L689">			final Object type = source[sourceIdx];</span>
+<span class="fc" id="L690">			target[targetIdx++] = type;</span>
+<span class="fc bfc" id="L691" title="All 4 branches covered.">			if (type == Opcodes.LONG || type == Opcodes.DOUBLE) {</span>
+<span class="fc" id="L692">				target[targetIdx++] = Opcodes.TOP;</span>
+			}
+		}
+<span class="fc" id="L695">		return targetIdx;</span>
+	}
+
+	/**
+	 * Reduce double word types into a single slot.
+	 */
+	private int reduce(final Object[] source, final int size,
+			final Object[] target) {
+<span class="fc" id="L703">		int targetIdx = 0;</span>
+<span class="fc bfc" id="L704" title="All 2 branches covered.">		for (int sourceIdx = 0; sourceIdx &lt; size; sourceIdx++) {</span>
+<span class="fc" id="L705">			final Object type = source[sourceIdx];</span>
+<span class="fc" id="L706">			target[targetIdx++] = type;</span>
+<span class="fc bfc" id="L707" title="All 4 branches covered.">			if (type == Opcodes.LONG || type == Opcodes.DOUBLE) {</span>
+<span class="fc" id="L708">				sourceIdx++;</span>
+			}
+		}
+<span class="fc" id="L711">		return targetIdx;</span>
+	}
+
+	/**
+	 * Replaces a type in the locals and on the stack. This is used for
+	 * uninitialized objects.
+	 * 
+	 * @param oldtype
+	 *            type to replace
+	 * @param newtype
+	 *            replacement type
+	 */
+	private void replace(final Object oldtype, final Object newtype) {
+<span class="fc bfc" id="L724" title="All 2 branches covered.">		for (int i = 0; i &lt; localSize; i++) {</span>
+<span class="fc bfc" id="L725" title="All 2 branches covered.">			if (oldtype.equals(local[i])) {</span>
+<span class="fc" id="L726">				local[i] = newtype;</span>
+			}
+		}
+<span class="fc bfc" id="L729" title="All 2 branches covered.">		for (int i = 0; i &lt; stackSize; i++) {</span>
+<span class="fc bfc" id="L730" title="All 2 branches covered.">			if (oldtype.equals(stack[i])) {</span>
+<span class="fc" id="L731">				stack[i] = newtype;</span>
+			}
+		}
+<span class="fc" id="L734">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.5.20131211-0329</span>Code Coverage Report for JaCoCo 0.6.5-SNAPSHOT</div></body></html>

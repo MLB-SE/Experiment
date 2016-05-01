@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testbeta
+symbolic.method = beta.beta(sym#sym);

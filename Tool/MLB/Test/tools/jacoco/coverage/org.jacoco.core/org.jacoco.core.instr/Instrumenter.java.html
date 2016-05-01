@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../.resources/report.gif" type="image/gif"/><title>Instrumenter.java</title><link rel="stylesheet" href="../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../.sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">JaCoCo</a> &gt; <a href="../index.html" class="el_bundle">org.jacoco.core</a> &gt; <a href="index.source.html" class="el_package">org.jacoco.core.instr</a> &gt; <span class="el_source">Instrumenter.java</span></div><h1>Instrumenter.java</h1><pre class="source lang-java linenums">/*******************************************************************************
+ * Copyright (c) 2009, 2013 Mountainminds GmbH &amp; Co. KG and Contributors
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Marc R. Hoffmann - initial API and implementation
+ *    
+ *******************************************************************************/
+package org.jacoco.core.instr;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import org.jacoco.core.internal.ContentTypeDetector;
+import org.jacoco.core.internal.Pack200Streams;
+import org.jacoco.core.internal.data.CRC64;
+import org.jacoco.core.internal.flow.ClassProbesAdapter;
+import org.jacoco.core.internal.instr.ClassInstrumenter;
+import org.jacoco.core.runtime.IExecutionDataAccessorGenerator;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+
+/**
+ * Several APIs to instrument Java class definitions for coverage tracing.
+ */
+public class Instrumenter {
+
+	private final IExecutionDataAccessorGenerator accessGenerator;
+
+	/**
+	 * Creates a new instance based on the given runtime.
+	 * 
+	 * @param runtime
+	 *            runtime used by the instrumented classes
+	 */
+<span class="fc" id="L47">	public Instrumenter(final IExecutionDataAccessorGenerator runtime) {</span>
+<span class="fc" id="L48">		this.accessGenerator = runtime;</span>
+<span class="fc" id="L49">	}</span>
+
+	/**
+	 * Creates a ASM adapter for a class with the given id.
+	 * 
+	 * @param classid
+	 *            id of the class calculated with {@link CRC64}
+	 * @param cv
+	 *            next class visitor in the chain
+	 * @return new visitor to write class definition to
+	 */
+	private ClassVisitor createInstrumentingVisitor(final long classid,
+			final ClassVisitor cv) {
+<span class="fc" id="L62">		return new ClassProbesAdapter(new ClassInstrumenter(classid,</span>
+				accessGenerator, cv));
+	}
+
+	/**
+	 * Creates a instrumented version of the given class if possible.
+	 * 
+	 * @param reader
+	 *            definition of the class as ASM reader
+	 * @return instrumented definition
+	 * 
+	 */
+	public byte[] instrument(final ClassReader reader) {
+<span class="fc" id="L75">		final ClassWriter writer = new ClassWriter(reader, 0);</span>
+<span class="fc" id="L76">		final ClassVisitor visitor = createInstrumentingVisitor(</span>
+				CRC64.checksum(reader.b), writer);
+<span class="fc" id="L78">		reader.accept(visitor, ClassReader.EXPAND_FRAMES);</span>
+<span class="fc" id="L79">		return writer.toByteArray();</span>
+	}
+
+	/**
+	 * Creates a instrumented version of the given class if possible.
+	 * 
+	 * @param buffer
+	 *            definition of the class
+	 * @param name
+	 *            a name used for exception messages
+	 * @return instrumented definition
+	 * @throws IOException
+	 *             if the class can't be analyzed
+	 */
+	public byte[] instrument(final byte[] buffer, final String name)
+			throws IOException {
+		try {
+<span class="fc" id="L96">			return instrument(new ClassReader(buffer));</span>
+<span class="fc" id="L97">		} catch (final RuntimeException e) {</span>
+<span class="fc" id="L98">			throw instrumentError(name, e);</span>
+		}
+	}
+
+	/**
+	 * Creates a instrumented version of the given class if possible.
+	 * 
+	 * @param input
+	 *            stream to read class definition from
+	 * @param name
+	 *            a name used for exception messages
+	 * @return instrumented definition
+	 * @throws IOException
+	 *             if reading data from the stream fails or the class can't be
+	 *             instrumented
+	 */
+	public byte[] instrument(final InputStream input, final String name)
+			throws IOException {
+		try {
+<span class="fc" id="L117">			return instrument(new ClassReader(input));</span>
+<span class="fc" id="L118">		} catch (final RuntimeException e) {</span>
+<span class="fc" id="L119">			throw instrumentError(name, e);</span>
+		}
+	}
+
+	/**
+	 * Creates a instrumented version of the given class file.
+	 * 
+	 * @param input
+	 *            stream to read class definition from
+	 * @param output
+	 *            stream to write the instrumented version of the class to
+	 * @param name
+	 *            a name used for exception messages
+	 * @throws IOException
+	 *             if reading data from the stream fails or the class can't be
+	 *             instrumented
+	 */
+	public void instrument(final InputStream input, final OutputStream output,
+			final String name) throws IOException {
+		try {
+<span class="fc" id="L139">			output.write(instrument(new ClassReader(input)));</span>
+<span class="fc" id="L140">		} catch (final RuntimeException e) {</span>
+<span class="fc" id="L141">			throw instrumentError(name, e);</span>
+<span class="fc" id="L142">		}</span>
+<span class="fc" id="L143">	}</span>
+
+	private IOException instrumentError(final String name,
+			final RuntimeException cause) {
+<span class="fc" id="L147">		final IOException ex = new IOException(String.format(</span>
+				&quot;Error while instrumenting class %s.&quot;, name));
+<span class="fc" id="L149">		ex.initCause(cause);</span>
+<span class="fc" id="L150">		return ex;</span>
+	}
+
+	/**
+	 * Creates a instrumented version of the given resource depending on its
+	 * type. Class files and the content of archive files are instrumented. All
+	 * other files are copied without modification.
+	 * 
+	 * @param input
+	 *            stream to contents from
+	 * @param output
+	 *            stream to write the instrumented version of the contents
+	 * @param name
+	 *            a name used for exception messages
+	 * @return number of instrumented classes
+	 * @throws IOException
+	 *             if reading data from the stream fails or a class can't be
+	 *             instrumented
+	 */
+	public int instrumentAll(final InputStream input,
+			final OutputStream output, final String name) throws IOException {
+<span class="fc" id="L171">		final ContentTypeDetector detector = new ContentTypeDetector(input);</span>
+<span class="fc bfc" id="L172" title="All 5 branches covered.">		switch (detector.getType()) {</span>
+		case ContentTypeDetector.CLASSFILE:
+<span class="fc" id="L174">			instrument(detector.getInputStream(), output, name);</span>
+<span class="fc" id="L175">			return 1;</span>
+		case ContentTypeDetector.ZIPFILE:
+<span class="fc" id="L177">			return instrumentZip(detector.getInputStream(), output, name);</span>
+		case ContentTypeDetector.GZFILE:
+<span class="fc" id="L179">			return instrumentGzip(detector.getInputStream(), output, name);</span>
+		case ContentTypeDetector.PACK200FILE:
+<span class="fc" id="L181">			return instrumentPack200(detector.getInputStream(), output, name);</span>
+		default:
+<span class="fc" id="L183">			copy(detector.getInputStream(), output);</span>
+<span class="fc" id="L184">			return 0;</span>
+		}
+	}
+
+	private int instrumentZip(final InputStream input,
+			final OutputStream output, final String name) throws IOException {
+<span class="fc" id="L190">		final ZipInputStream zipin = new ZipInputStream(input);</span>
+<span class="fc" id="L191">		final ZipOutputStream zipout = new ZipOutputStream(output);</span>
+		ZipEntry entry;
+<span class="fc" id="L193">		int count = 0;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">		while ((entry = zipin.getNextEntry()) != null) {</span>
+<span class="fc" id="L195">			zipout.putNextEntry(new ZipEntry(entry.getName()));</span>
+<span class="fc" id="L196">			count += instrumentAll(zipin, zipout, name + &quot;@&quot; + entry.getName());</span>
+<span class="fc" id="L197">			zipout.closeEntry();</span>
+		}
+<span class="fc" id="L199">		zipout.finish();</span>
+<span class="fc" id="L200">		return count;</span>
+	}
+
+	private int instrumentGzip(final InputStream input,
+			final OutputStream output, final String name) throws IOException {
+<span class="fc" id="L205">		final GZIPOutputStream gzout = new GZIPOutputStream(output);</span>
+<span class="fc" id="L206">		final int count = instrumentAll(new GZIPInputStream(input), gzout, name);</span>
+<span class="fc" id="L207">		gzout.finish();</span>
+<span class="fc" id="L208">		return count;</span>
+	}
+
+	private int instrumentPack200(final InputStream input,
+			final OutputStream output, final String name) throws IOException {
+<span class="fc" id="L213">		final ByteArrayOutputStream buffer = new ByteArrayOutputStream();</span>
+<span class="fc" id="L214">		final int count = instrumentAll(Pack200Streams.unpack(input), buffer,</span>
+				name);
+<span class="fc" id="L216">		Pack200Streams.pack(buffer.toByteArray(), output);</span>
+<span class="fc" id="L217">		return count;</span>
+	}
+
+	private void copy(final InputStream input, final OutputStream output)
+			throws IOException {
+<span class="fc" id="L222">		final byte[] buffer = new byte[1024];</span>
+		int len;
+<span class="fc bfc" id="L224" title="All 2 branches covered.">		while ((len = input.read(buffer)) != -1) {</span>
+<span class="fc" id="L225">			output.write(buffer, 0, len);</span>
+		}
+<span class="fc" id="L227">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.6.5.20131211-0329</span>Code Coverage Report for JaCoCo 0.6.5-SNAPSHOT</div></body></html>

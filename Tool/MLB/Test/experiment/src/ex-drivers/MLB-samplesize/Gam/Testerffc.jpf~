@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testgam
+symbolic.method = gam.gammq(sym#sym);

@@ -1,0 +1,7 @@
+
+
+public class TestCisi {
+	public static void main(String[] main){
+		cisi.cisi(1.0);
+	}
+}

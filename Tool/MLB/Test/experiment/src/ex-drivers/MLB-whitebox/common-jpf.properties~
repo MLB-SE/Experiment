@@ -1,0 +1,12 @@
+@include ../../../../../jpf-symbc/jpf.properties
+#listener=gov.nasa.jpf.symbc.SymbolicListener,gov.nasa.jpf.symbc.concolic.ConcreteExecutionListener
+search.multiple_errors = true
+#search.depth_limit =10
+#symbolic.max_pc_length = 7
+symbolic.max_pc_msec = 30000
+symbolic.string_preprocess_only = true
+#symbolic.debug=true
+symbolic.timer=set
+# Suppress reporting the result
+# (We only care about the generated unit test code)
+#report.console.finished=

@@ -1,0 +1,7 @@
+
+
+public class Testpoidev {
+	public static void main(String[] main){
+		poidev.poidev(1.0);
+	}
+}

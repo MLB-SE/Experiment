@@ -1,0 +1,611 @@
+package coral.tests;
+import org.apache.commons.math3.util.FastMath;
+public class JPFBenchmark {
+
+  public static String sucess = "sucess";
+
+  // sin(x) + cos(y) > 1.0
+  public static void benchmark01(double x, double y) {
+    if (FastMath.sin(x) + FastMath.cos(y) > 1) {
+      System.out.println("sucess");
+    }
+  }
+
+  // sin(x) - cos(y) < 0.0000000001
+  public static void benchmark02(double x, double y) {
+    if (FastMath.sin(x) - FastMath.cos(y) < 0.0000000001) {
+      System.out.println("sucess");
+    }
+  }
+
+  // sin(x) - cos(y) == 0.0
+  public static void benchmark03(double x, double y) {
+    if (FastMath.sin(x) - FastMath.cos(y) == 0) {
+      System.out.println("sucess");
+    }
+  }
+
+  // exp(x) > 0.0
+  public static void benchmark04(double x) {
+    if (FastMath.exp(x) > 0) {
+      System.out.println("sucess");
+    }
+  }
+
+  // sin A + sin B + sin C = 4 * cos A * cos B * cos C
+  public static void benchmark05(double x, double y, double z) {
+    if (FastMath.sin(x) + FastMath.sin(y) + FastMath.sin(z) == 4 * FastMath.cos(x)
+        * FastMath.cos(y) * FastMath.cos(z)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // cos A + cos B + cos C > 4 sin A/2 sin B/2 sin C/2
+  public static void benchmark06(double x, double y, double z) {
+    if (FastMath.cos(x) + FastMath.cos(y) + FastMath.cos(z) > 4 * FastMath.sin(x / 2)
+        * FastMath.sin(y / 2) * FastMath.sin(z / 2)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // (sin(2x - y)/(cos(2y + y) + 1) = cos(2z + x)/(sin(2w + y) - 1)
+  public static void benchmark07(double x, double y, double z, double w) {
+    if (FastMath.sin(2 * x - y) / (FastMath.cos(2 * y + y) + 1) == FastMath.cos(2 * z + x)
+        / (FastMath.sin(2 * w + y) - 1)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // cos(3x+2y-z) * sin(z+x+y) == cos(z*x*y)
+  public static void benchmark08(double x, double y, double z) {
+    if (FastMath.cos(3 * x + 2 * y - z) * FastMath.sin(z + x + y) == FastMath
+        .cos(z * x * y)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // FastMath.sin(FastMath.cos(x*y)) < FastMath.cos(FastMath.sin(x*y))
+  public static void benchmark09(double x, double y) {
+    if (FastMath.sin(FastMath.cos(x * y)) < FastMath.cos(FastMath.sin(x * y))) {
+      System.out.println("sucess");
+    }
+  }
+
+  // FastMath.sin(x*FastMath.cos(y*FastMath.sin(z))) > FastMath.cos(x*FastMath.sin(y*FastMath.cos(z)))
+  public static void benchmark10(double x, double y, double z) {
+    if (FastMath.sin(x * FastMath.cos(y * FastMath.sin(z))) > FastMath.cos(x
+        * FastMath.sin(y * FastMath.cos(z)))) {
+      System.out.println("sucess");
+    }
+  }
+
+  // asin(x) < cos(y)*cos(z) - FastMath.atan(w)
+  public static void benchmark11(double x, double y, double z, double w) {
+	  if(FastMath.asin(x) < FastMath.cos(y) * FastMath.cos(z) - FastMath.atan(w)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // (asin(x) * FastMath.asin(y))-1 < FastMath.atan(z) * FastMath.atan(w)  
+  public static void benchmark12(double x, double y, double z, double w) {
+	  if((FastMath.asin(x) * FastMath.asin(y)) - 1 < FastMath.atan(z) * FastMath.atan(w)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // sin(y) * FastMath.asin(x) < cos(y)*cos(z) - FastMath.atan(w)
+  public static void benchmark13(double x, double y, double z, double w) {
+	if(FastMath.sin(y) * FastMath.asin(x) < FastMath.cos(y)*FastMath.cos(z) - FastMath.atan(w)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // sin(y) * FastMath.asin(x) - 300 < cos(y)*cos(z) - FastMath.atan(w)
+  public static void benchmark14(double x, double y, double z, double w) {
+	if(FastMath.sin(y) * FastMath.asin(x) - 300 < FastMath.cos(y)*FastMath.cos(z) - FastMath.atan(w)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // ((FastMath.asin(1) * FastMath.asin(cos(9*57)))-1) < (FastMath.atan(0) * FastMath.atan(0)) solução; x=1,y=513,z=0,w=0
+  public static void benchmark15(double x, double y, double z, double w) {
+	  if(((FastMath.asin(x) * FastMath.asin(FastMath.cos(y)))-x) < (FastMath.atan(z) * FastMath.atan(w))) {
+		  System.out.println("sucess");
+    }
+  }
+
+	//((((tan_(($V4-$V1))*cos_(sin_(($V4/$V5))))-atan_((($V2+20.0)+$V3)))+asin_(($V2-15.0))) < ((sin_(($V4*$V4))*cos_((($V1*$V4)*$V5)))-tan_((cos_((($V1*$V4)*$V1))+sin_($V4)))))  
+	public static void benchmark16(double x, double y, double z, double w, double v) {
+		if(FastMath.tan(w-x)*FastMath.cos(FastMath.sin(w/v)) - FastMath.atan(y + 20 + z) + FastMath.asin(y-15) < FastMath.sin(w * w) * FastMath.cos(x*w*v) - FastMath.tan(FastMath.cos(x*w*x)) + FastMath.sin(w)){
+      System.out.println("sucess");
+    }
+	}
+
+  // FastMath.asin(x) * FastMath.acos(x) < FastMath.atan(x)  
+  public static void benchmark17(double x) {
+	if(FastMath.asin(x) * FastMath.acos(x) < FastMath.atan(x)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // (1+FastMath.acos(x)) < FastMath.asin(x)
+  public static void benchmark18(double x) {
+	  if((1+FastMath.acos(x)) < FastMath.asin(x)) {
+      System.out.println("sucess");
+    }
+  }
+
+  // 3*FastMath.acos(x) < FastMath.atan(y) + FastMath.asin(z)
+  public static void benchmark19(double x, double y, double z) {
+	  if( 3*FastMath.acos(x) < FastMath.atan(y) + FastMath.asin(z)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // sin(sin((x*y)) < 0 && cos(2x) > 0.25
+  public static void benchmark20(double x, double y) {
+	  if(FastMath.sin(FastMath.sin(x*y)) < 0 && FastMath.cos(2*x) > 0.25) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // cos(x*y) < 0 && sin(2x) > 0.25
+	public static void benchmark21(double x, double y) {
+		if( FastMath.cos(x*y) < 0 && FastMath.sin(2*x) > 0.25) {
+			System.out.println("sucess");
+		}
+	}
+
+  // (sin_(cos_(($V1*$V2))) < cos_(sin_(($V2*$V3)))) & 
+  // ((sin_((($V4*2.0)-$V2))/(cos_((($V6*2.0)+$V7))+1.0)) == (cos_((($V3*2.0)+$V1))/(sin_((($V4*2.0)+$V5))+1.0))))
+	public static void benchmark22(double x, double y, double z, double w, double v, double t, double q) {
+		if((FastMath.sin(FastMath.cos(x*y)) < FastMath.cos(FastMath.sin(y*z))) && 
+		   FastMath.sin(w*2.0 -y)/(FastMath.cos(t*2.0+q)+1.0) == (FastMath.cos(z*2.0+x)/(FastMath.sin(w*2.0+v)+1.0))) {
+			System.out.println("sucess");
+		}
+	}
+
+  // (sin(2x - y)/(cos(2y + x) + 1) = cos(2z + x)/(sin(2w + y) - 1) &
+  // sin(x*y*z*w) > 0 &
+  // cos(x*y*z*w) < 0
+
+  public static void benchmark23(double x, double y, double z, double w) {
+	  if(FastMath.sin(2*x - y)/(FastMath.cos(2*y + x) + 1) == FastMath.cos(2*z + x)/(FastMath.sin(2*w + y) - 1) &&
+		 FastMath.sin(x*y*z*w) > 0 && FastMath.cos(x*y*z*w) < 0) {
+      System.out.println("sucess");
+    }
+  }
+
+  //  sin(cos(x*y)) < cos(sin(x*z)) &
+  // (sin(2w - y)/(cos(2y + v) + 1) = cos(2z + x)/(sin(2w + v) - 1)
+  public static void benchmark25(double x, double y, double z, double w, double v) {
+	  if(FastMath.sin(FastMath.cos(x*y)) < FastMath.cos(FastMath.sin(x*z)) && (FastMath.sin(2*w - y)/(FastMath.cos(2*y + v) + 1) == FastMath.cos(2*z + x)/(FastMath.sin(2*w + v) - 1))) {
+		  System.out.println("sucess");
+    }
+  }
+
+  // sin(cos(x*y)) < cos(sin(x*z)) 
+  // (sin(2w - y)/(cos(2y + v) + 1) = cos(2z + x)/(sin(2w + v) - 1) 
+  // sin(x*y*z*w) > 0 && cos(x*y*z*w) < 0
+	  public static void benchmark26(double x, double y, double z, double w, double v) {
+		  if(FastMath.sin(FastMath.cos(x*y)) < FastMath.cos(FastMath.sin(x*z)) && (FastMath.sin(2*w - y)/(FastMath.cos(2*y + v) + 1) == FastMath.cos(2*z + x)/(FastMath.sin(2*w + v) - 1)) &&  FastMath.sin(x*y*z*w) > 0 && FastMath.cos(x*y*z*w) < 0 ) {
+			  System.out.println("sucess");
+    }
+  }
+
+  // sin(x*cos(y*sin(z))) > cos(x*sin(y*cos(z))) && sin(cos(x*y)) < cos(sin(x*y))
+  public static void benchmark27(double x, double y, double z) {
+	if(FastMath.sin(x*FastMath.cos(y*FastMath.sin(z))) > FastMath.cos(x*FastMath.sin(y*FastMath.cos(z))) && FastMath.sin(FastMath.cos(x*y)) < FastMath.cos(FastMath.sin(x*y))) {
+      System.out.println("sucess");
+    }
+  }
+
+  // log($V1) == 2.0
+  public static void benchmark28(double x) {
+	  if(FastMath.log(x) == 2) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  public static void benchmark29(double x) {
+	  if(FastMath.exp(x) > 5){
+		  System.out.println("sucess");
+	  }
+  }
+
+  // log_10($v1) == 2.0
+  public static void benchmark30(double x) {
+	  if(FastMath.log10(x) == 2){
+		  System.out.println("sucess");
+	  }
+  }
+
+  public static void benchmark31(double x) {
+
+	  if(FastMath.round(x) > 5) {
+			  System.out.println("sucess");
+    }
+  }
+
+  public static void benchmark32(double x) {
+	  if(FastMath.sqrt(x) > 5) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // sqrt(sin($V1)) > sqrt(cos($V1))
+  public static void benchmark33(double x) {
+	  if(FastMath.sqrt(FastMath.sin(x)) > FastMath.sqrt(FastMath.cos(x))) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // sqrt(sin($V1)) < sqrt(cos($V1))
+  public static void benchmark34(double x) {
+	  if(FastMath.sqrt(FastMath.sin(x)) < FastMath.sqrt(FastMath.cos(x))) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  //  1.0/sqrt(sin($V1)) > sqrt(cos(exp($V2)))
+  public static void benchmark35(double x,double y) {
+	  if(1.0/FastMath.sqrt(FastMath.sin(x)) > FastMath.sqrt(FastMath.cos(FastMath.exp(y)))){
+		  System.out.println("sucess");
+	  }
+  }
+
+  // ((log10($V3)*(1.0/sqrt(sin_($V1)))) == sqrt(cos_(exp($V2))))
+  public static void benchmark36(double x,double y,double z) {
+	  if(FastMath.log10(z)*(1.0/FastMath.sqrt(FastMath.sin(x))) == FastMath.sqrt(FastMath.cos(FastMath.exp(y)))) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // ((log10(tan_($V3))/(1.0/sqrt(sin_($V1)))) == sqrt(cos_(exp($V2))))
+  public static void benchmark37(double x,double y,double z) {
+	  if(FastMath.log10(FastMath.tan(z))*(1.0/FastMath.sqrt(FastMath.sin(x))) == FastMath.sqrt(FastMath.cos(FastMath.exp(y)))) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // (atan2_($V1,$V2) == 1.0)
+  public static void benchmark38(double x,double y) {
+	  if(FastMath.atan2(x,y) == 1.0) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // (pow_($V1,$V2) == 1.0)
+  public static void benchmark39(double x,double y) {
+	  if(FastMath.pow(x,y) == 1.0) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // pow(x,2) == x + y
+  public static void benchmark40(double x,double y) {
+	  if(FastMath.pow(x,2) == x + y) {
+		  System.out.println("sucess");
+	  }
+  }
+
+ // pow(x,2) == x + y & x >= -1 & y <=  2
+ 
+  public static void benchmark41(double x,double y) {
+	  if(FastMath.pow(x,2) == x + y &&  x >= -1 && y <=  2 ) {
+		  System.out.println("sucess");
+	  }
+  }
+  // FastMath.pow(x,y) > FastMath.pow(y,x) & x > 1 & y <= 10
+   public static void benchmark42(double x,double y) {
+	  if(FastMath.pow(x,y) > FastMath.pow(y,x) && x > 1 && y <= 10) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // FastMath.pow(x,y) > FastMath.pow(y,x) && FastMath.exp(x,y) > FastMath.exp(y,x) && y < x ^ 2
+
+  public static void benchmark43(double x,double y) {
+	  if(FastMath.pow(x,y) > FastMath.pow(y,x) && FastMath.exp(y) > FastMath.exp(x) && y < FastMath.pow(x,2)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // FastMath.pow(x,y) > FastMath.pow(y,x) && FastMath.exp(x,y) < FastMath.exp(y,x)
+
+  public static void benchmark44(double x,double y) {
+	  if(FastMath.pow(x,y) > FastMath.pow(y,x) && FastMath.exp(y) < FastMath.exp(x)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+	// sqrt(FastMath.exp(x+y)) < FastMath.pow(z,x) && x > 0 && y > 1 && z > 1 && y <= x + 2
+
+	public static void benchmark45(double x,double y,double z) {
+		if(FastMath.sqrt(FastMath.exp(x+y)) < FastMath.pow(z,x) && x > 0 && y > 1 && z > 1 && y <= x + 2) {
+			System.out.println("sucess");
+		}
+	}  	
+
+  // FastMath.sqrt(e^(x + z)) < z^x && x > 0 && y > 1 && z > 1 && y < 1 && y < x + 2 && w = x + 2
+
+  public static void benchmark46(double x,double y, double z, double w) {
+	  if(FastMath.sqrt(FastMath.pow(FastMath.E,(x + z))) < FastMath.pow(z,x) && x > 0 && y > 1 && z > 1 && y < 1 && y < x + 2 && w == x + 2) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // e ^ (x + y) == e ^ z 
+  
+  public static void benchmark47(double x,double y,double z) {
+	  if(FastMath.exp(x + y) == FastMath.exp(z)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  // x + y != z
+  public static void benchmark48(double x,double y, double z) {
+	  if(x + y != z) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  //x^2 + 3*FastMath.sqrt(y) < x*y && x < y ^ 2 && x + y < 50 //556 possible integer solutions
+
+  public static void benchmark49(double x,double y) {
+	  if(FastMath.pow(x,2) + 3*FastMath.sqrt(y) < x*y && x < FastMath.pow(y,2) && x + y < 50) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  //x^2 + 3*FastMath.sqrt(y) < x*y && x < y ^ 2 && x + y < 50 && x = -13 + y //18 possible integer solutions
+
+  public static void benchmark50(double x,double y) {
+	  if(FastMath.pow(x,2) + 3*FastMath.sqrt(y) < x*y && x < FastMath.pow(y,2) && x + y < 50 && x == -13 + y) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  //x^2 + 3*FastMath.sqrt(y) < x*y && x < y ^ 2 && x + y < 50 && x = -13 + y && x ^ x < FastMath.log10(y) //one integer solution
+  public static void benchmark51(double x,double y) {
+	  if(FastMath.pow(x,2) + 3*FastMath.sqrt(y) < x*y && x < FastMath.pow(y,2) && x + y < 50 && FastMath.pow(x,x) < FastMath.log10(y)) {
+		  System.out.println("sucess");
+	  }
+  }
+
+  //x ^ tan(y) + z < x * FastMath.atan(z) && sin(y) + cos(y) + tan(y) >= x - z
+	public static void benchmark52(double x,double y, double z) {
+	  if(FastMath.pow(x,FastMath.tan(y)) + z < x * FastMath.atan(z) && FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z) {
+		  System.out.println("sucess");
+	  }
+  }
+
+	//x ^ FastMath.tan(y) + z < x * FastMath.atan(z) && FastMath.sin(y) + cos(y) + FastMath.tan(y) >= x - z && FastMath.atan(x) + FastMath.atan(y) > y
+	public static void benchmark53(double x,double y, double z) {
+		if(FastMath.pow(x,FastMath.tan(y)) + z < x * FastMath.atan(z) && FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z && FastMath.atan(x) + FastMath.atan(y) > y) {
+			System.out.println("sucess");
+	  }
+	}
+
+  //x ^ FastMath.tan(y) + z < x * FastMath.atan(z) && FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z && FastMath.atan(x) + FastMath.atan(y) > y && FastMath.log(x^FastMath.tan(y)) < FastMath.log(z)
+	public static void benchmark54(double x,double y, double z) {
+		if(FastMath.pow(x,FastMath.tan(y)) + z < x * FastMath.atan(z) && FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z && FastMath.atan(x) + FastMath.atan(y) > y && FastMath.log(FastMath.pow(x,FastMath.tan(y))) < FastMath.log(z)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x ^ FastMath.tan(y) + z < x * FastMath.atan(z) &&  FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z &&  FastMath.atan(x) + FastMath.atan(y) > y &&  FastMath.log(x^FastMath.tan(y)) < FastMath.log(z) &&  FastMath.sqrt(y+z) > FastMath.sqrt(x^(x-y))  
+	public static void benchmark55(double x,double y, double z) {
+		if(FastMath.pow(x,FastMath.tan(y)) + z < x * FastMath.atan(z) && FastMath.sin(y) + FastMath.cos(y) + FastMath.tan(y) >= x - z && FastMath.atan(x) + FastMath.atan(y) > y && FastMath.log(FastMath.pow(x,FastMath.tan(y))) < FastMath.log(z) &&  FastMath.sqrt(y+z) > FastMath.sqrt(FastMath.pow(x,(x-y)))) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t)
+	public static void benchmark56(double x,double y, double z,double w, double t) {
+		if(x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t)) {
+			System.out.println("sucess");
+		}
+	}
+
+//x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t))
+	public static void benchmark57(double x,double y, double z,double w, double t) {
+		if(x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t))) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t)) && FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + acos(x+y+z) + FastMath.atan(x+y+z)
+	public static void benchmark58(double x,double y, double z,double w, double t) {
+		if(x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t)) && FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + FastMath.acos(x+y+z) + FastMath.atan(x+y+z)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t))	&& FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + FastMath.acos(x+y+z) + FastMath.atan(x+y+z) && w = t * 3 / 4
+	public static void benchmark59(double x,double y, double z,double w, double t) {
+		if(x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t)) && FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + FastMath.acos(x+y+z) + FastMath.atan(x+y+z) && w == t * 3 / 4) {
+			System.out.println("sucess");
+		}
+	}
+  //x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t))	&& FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + FastMath.acos(x+y+z) + FastMath.atan(x+y+z) && w = t * 3 / 4 && x < 2y - 3z
+	public static void benchmark60(double x,double y, double z,double w, double t) {
+		if(x * y + FastMath.atan(z) * FastMath.sin(w*t) > x/y + z + FastMath.tan(w+t) && FastMath.pow(FastMath.log10(x),FastMath.log10(y)) <= FastMath.pow(FastMath.log10(z+w+t),FastMath.tan(w*t)) && FastMath.tan(w*(x+y)) + FastMath.sin(t*(y+z)) > FastMath.asin(x+y+z) + FastMath.acos(x+y+z) + FastMath.atan(x+y+z) && w == t * 3 / 4 && x < 2*y - 3*z) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x + y > z / w && FastMath.sqrt(x) > z / y && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y
+	public static void benchmark61(double x,double y, double z,double w) {
+		if(x + y > z / w && FastMath.sqrt(x) > z / y && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x + y > z / w && FastMath.sqrt(x) > z / y && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y && x > (w+y-z)
+	public static void benchmark62(double x,double y, double z,double w) {
+		if(x + y > z / w && FastMath.sqrt(x) > z / y && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y && x > (w+y-z)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x + y > z / w && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z)
+	public static void benchmark63(double x,double y, double z,double w, double t) {
+		if(x + y > z / w && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,6) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x + y > z / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) &&	x * (t + y) > FastMath.log(w*z*3) 
+
+	public static void benchmark64(double x,double y, double z,double w, double t) {
+		if(x + y > z / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) &&	x * (t + y) > FastMath.log(w*z*3)) {
+			System.out.println("sucess");
+		}
+	}
+  //x + y > z / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3)
+	public static void benchmark65(double x,double y, double z,double w, double t) {
+		if(x + y > z / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x + y > (z+ t) / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) > FastMath.cos(y)
+	public static void benchmark66(double x,double y, double z,double w, double t) {
+		if(x + y > (z+ t) / (w + t) && FastMath.sqrt(x) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) > FastMath.cos(y)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y)
+	public static void benchmark67(double x,double y, double z,double w, double t, double v) {
+		if(x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y)
+	public static void benchmark68(double x,double y, double z,double w, double t, double v) {
+		if(x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y) && FastMath.sin(x*y) + FastMath.sin(z*w) + FastMath.sin(t*v) < FastMath.cos(x*y) + FastMath.cos(z*w) + FastMath.cos(t*v)
+	public static void benchmark69(double x,double y, double z,double w, double t, double v) {
+		if(x - y + FastMath.tan(v)> (z+ t) / (w + t) && FastMath.sqrt(x-t) > z / y && FastMath.log(x*y) > FastMath.log(t+w+z) && z*2 + w*3 + x*7 < FastMath.pow(y,t)*FastMath.cos(v) && z + w > x + y && w < x/y && x > (w+y-z) && FastMath.log10(t*x) < FastMath.sqrt(w*y*z) && x * FastMath.cos(t + y) > FastMath.log(w*z*3) && FastMath.cos(t) * FastMath.sin(v) > FastMath.cos(y) && FastMath.sin(x*y) + FastMath.sin(z*w) + FastMath.sin(t*v) < FastMath.cos(x*y) + FastMath.cos(z*w) + FastMath.cos(t*v)) {
+			System.out.println("sucess");
+		}
+	}
+
+  //FastMath.sin(a) > FastMath.sin(b) > FastMath.sin(c) > FastMath.sin(d) > FastMath.sin(e) > FastMath.sin(f) > FastMath.sin(g) > FastMath.sin(h) > FastMath.sin(i) > FastMath.sin(j) > FastMath.sin(k) > FastMath.sin(l) > FastMath.sin(m) > FastMath.sin(n) > FastMath.sin(o) > FastMath.sin(p) > FastMath.sin(q) > FastMath.sin(r) > FastMath.sin(s) > FastMath.sin(t) > FastMath.sin(u) > FastMath.sin(v) > FastMath.sin(x) > FastMath.sin(z)
+	public static void benchmark70(double a,double b, double c,double d, double e, double f, double g, double h, double i, double j, double k, double l, double m, double n, double o, double p, double q, double r, double s, double t, double u, double v, double x, double z) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g) && FastMath.sin(g) > FastMath.sin(h) && FastMath.sin(h) > FastMath.sin(i) && FastMath.sin(i) > FastMath.sin(j) && FastMath.sin(j) > FastMath.sin(k) && FastMath.sin(k) > FastMath.sin(l) && FastMath.sin(l) > FastMath.sin(m) && FastMath.sin(m) > FastMath.sin(n) && FastMath.sin(n) > FastMath.sin(o) && FastMath.sin(o) > FastMath.sin(p) && FastMath.sin(p) > FastMath.sin(q) && FastMath.sin(q) > FastMath.sin(r) && FastMath.sin(r) > FastMath.sin(s) && FastMath.sin(s) > FastMath.sin(t) && FastMath.sin(t) > FastMath.sin(u) && FastMath.sin(u) > FastMath.sin(v) && FastMath.sin(v) > FastMath.sin(x) && FastMath.sin(x) > FastMath.sin(z)) {
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark71(double a,double b, double c,double d, double e, double f, double g, double h, double i, double j, double k, double l) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g) && FastMath.sin(g) > FastMath.sin(h) && FastMath.sin(h) > FastMath.sin(i) && FastMath.sin(i) > FastMath.sin(j) && FastMath.sin(j) > FastMath.sin(k) && FastMath.sin(k) > FastMath.sin(l) ) { 
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark72(double a,double b, double c,double d, double e, double f, double g) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g)) { 
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark73(double a,double b, double c,double d, double e, double f, double g, double h, double i, double j) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g) && FastMath.sin(g) > FastMath.sin(h) && FastMath.sin(h) > FastMath.sin(i) && FastMath.sin(i) > FastMath.sin(j)) {
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark74(double a,double b, double c,double d, double e, double f, double g, double h) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g) && FastMath.sin(g) > FastMath.sin(h)) {
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark75(double a,double b, double c,double d, double e, double f, double g, double h, double i) {
+		if(FastMath.sin(a) > FastMath.sin(b) && FastMath.sin(b) > FastMath.sin(c) && FastMath.sin(c) > FastMath.sin(d) && FastMath.sin(d) > FastMath.sin(e) && FastMath.sin(e) > FastMath.sin(f) && FastMath.sin(f) > FastMath.sin(g) && FastMath.sin(g) > FastMath.sin(h) && FastMath.sin(h) > FastMath.sin(i)) {
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark76(double a,double b, double c,double d, double e, double f, double g, double h, double i) {
+		if(a > b && b > c && c > d && d > e && e > f && f > g && g > h && h > i) {
+			System.out.println("sucess");
+		}
+	}
+
+	public static void benchmark77(double a,double b, double c,double d, double e, double f, double g, double h, double i, double j) {
+		if(a > b && b > c && c > d && d > e && e > f && f > g && g > h && h > i && i > j) {
+			System.out.println("sucess");
+		}
+	}
+
+	//(0.0 == (pow_((($V1*sin_(((($V2*0.017453292519943295)-($V3*0.017453292519943295))+(((((((pow_($V4,2.0)/(sin_(($V5*0.017453292519943295))/cos_(($V5*0.017453292519943295))))/68443.0)*0.0)/$V4)*-1.0)*$V1)/((pow_($V1,2.0)/(sin_(($V5*0.017453292519943295))/cos_(($V5*0.017453292519943295))))/68443.0)))))-($V4*0.0)),2.0)+pow_((($V1*cos_(((($V2*0.017453292519943295)-($V3*0.017453292519943295))+(((((((pow_($V4,2.0)/(sin_(($V5*0.017453292519943295))/cos_(($V5*0.017453292519943295))))/68443.0)*0.0)/$V4)*-1.0)*$V1)/((pow_($V1,2.0)/(sin_(($V5*0.017453292519943295))/cos_(($V5*0.017453292519943295))))/68443.0)))))-($V4*1.0)),2.0)))
+
+	//AND(AND(,($V6 != 0)),($V8 != 0)))
+
+	public static void benchmark78(double a,double b, double c,double d, double e, int f, int g, int h) {
+		if((0.0 == (FastMath.pow(((a*FastMath.sin(((b*0.017453292519943295 - c*0.017453292519943295)+(((((((FastMath.pow(d,2.0)/(FastMath.sin(e*0.017453292519943295)/FastMath.cos(e*0.017453292519943295)))/68443.0)*0.0)/d)*-1.0)*a)/((FastMath.pow(a,2.0)/(FastMath.sin((e*0.017453292519943295))/FastMath.cos((e*0.017453292519943295))))/68443.0)))))-(d*0.0)),2.0)+FastMath.pow(((a*FastMath.cos((((b*0.017453292519943295)-(c*0.017453292519943295))+(((((((FastMath.pow(d,2.0)/(FastMath.sin((e*0.017453292519943295))/FastMath.cos((e*0.017453292519943295))))/68443.0)*0.0)/d)*-1.0)*a)/((FastMath.pow(a,2.0)/(FastMath.sin((e*0.017453292519943295))/FastMath.cos((e*0.017453292519943295))))/68443.0)))))-d*1.0),2.0))) && f != 0 && h != 0) {
+			System.out.println("sucess");
+		}
+	}
+
+//AND((0.0 == (pow_((($V84*sin_(((0.017453292519943295*$V85)-(0.017453292519943295*$V86))))-(0.0*$V87)),2.0)+pow_(($V84*cos_((((0.017453292519943295*$V85)-(0.017453292519943295*$V86))+0.0))),2.0))),($V82 != 0))
+
+	public static void benchmark79(double a,double b, double c,double d, int e) {
+		if((0.0 == (FastMath.pow(((a*FastMath.sin(((0.017453292519943295*b)-(0.017453292519943295*c))))-(0.0*d)),2.0)+ FastMath.pow((a*FastMath.cos((((0.017453292519943295*b)-(0.017453292519943295*c))+0.0))),2.0))) && e != 0) {
+			System.out.println("sucess");
+		}
+	}
+
+  //(1.5 - x1 * (1 - x2)) == 0
+	public static void benchmark80(double a,double b) {
+		if((1.5 - a * (1 - b)) == 0) {
+			System.out.println("sucess");
+		}
+	}
+
+  //(-13 + x1 + ((5 - x2) * x2 - 2) * x2) + (-29 + x1 + ((x2 + 1) * x2 - 14) * x2) == 0
+	public static void benchmark81(double a,double b) {
+		if((-13 + a + ((5 - b) * b - 2) * b) + (-29 + a + ((b + 1) * b - 14) * b) == 0) {
+			System.out.println("sucess");
+		}
+	}
+
+  // (FastMath.Pow(10, 4) * x1 * x2 - 1) == 0 && (FastMath.Pow(FastMath.E, -x1) + FastMath.Pow(FastMath.E, -x2) - 1.0001) == 0
+	public static void benchmark82(double a,double b) {
+		if((FastMath.pow(10, 4) * a * b - 1) == 0 && (FastMath.pow(FastMath.E, -a) + FastMath.pow(FastMath.E, -b) - 1.0001) == 0) {
+			System.out.println("sucess");
+		}
+	}
+
+  // FastMath.Pow((1 - x1), 2) + 100 * (FastMath.Pow((x2 - x1 * x1), 2)) == 0
+	public static void benchmark83(double a,double b) {
+		if(FastMath.pow((1 - a), 2) + 100 * (FastMath.pow((b - a * a), 2)) == 0) {
+			System.out.println("sucess");
+		}
+	}
+
+  //(10 * (x2 - x1 * x1)) == 0 && (1 - x1) == 0 && (FastMath.sqrt(90) * (x4 - x3 * x3)) == 0 && (1 - x3) == 0 && (FastMath.sqrt(10) * (x2 + x4 - 2)) == 0 && (FastMath.Pow(10, -0.5) * (x2 - x4)) == 0
+
+	public static void benchmark84(double a,double b, double c, double d) {
+		if((10 * (b - a * a)) == 0 && (1 - a) == 0 && (FastMath.sqrt(90) * (d - c * c)) == 0 && (1 - c) == 0 && (FastMath.sqrt(10) * (b + d - 2)) == 0 && (FastMath.pow(10, -0.5) * (b - d)) == 0) {
+			System.out.println("sucess");
+		}
+	}
+	
+	public static void benchmark91(double x, double y){
+	  if(FastMath.sin(x) == -FastMath.sin(y) && FastMath.sin(x) > 0)
+	    System.out.println("sucess");
+	}
+
+
+
+}

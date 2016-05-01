@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = TestAiry
+symbolic.method = airy.main_airy(sym)

@@ -1,0 +1,3 @@
+@include ../common-jpf-nr.properties
+target = Testell
+symbolic.method = ell.sncndn(sym#sym#sym);
