@@ -46,9 +46,9 @@ Running MLB requires an environment with a Java Development Kit (JDK) supporting
 - #### Generate Test Cases for  Programs
 	For using SPF on a target program, a ```*.jpf``` configuration file needs to be given and the relevant information  can be found in SPF documentation. 
     
-    MLB provides the  con?guration parameters as follows:
+    MLB provides the  configuration parameters as follows:
     - ```symbolic.mlpm = POSITIVE_INT (default:3000)```  The sample size as the budget of the generation. Note that the running time is almost linear to the sample size which means  a larger sample size may lead to a smaller estimated false negative rate but  more time than the smaller ones .
-    - ```symbolic.complex = 0 / 1 / 2 (default:2)```  The di?culty level of the problem under rough investigation. There are three preset levels: easy(0), where the function value changes slowly, e.g., x +1 = 0; modest(1), where the function value changes fast, e.g., sin(2|x|) = 0; and hard(2), where the function changes very fast, e.g., |e^x+3 ?e^3| = 0. 
+    - ```symbolic.complex = 0 / 1 / 2 (default:2)```  The di?culty level of the problem under rough investigation. There are three preset levels: easy(0), where the function value changes slowly, e.g., x +1 = 0; modest(1), where the function value changes fast, e.g., sin(2|x|) = 0; and hard(2), where the function changes very fast, e.g., |e^x+3*e^3| = 0. 
 
     - ```symbolic.strategy = classical / conservative (default:classical)``` The search strategy of symbolic execution. MLB backtracks when the path condition is infeasible or unsolved under the classical search strategy, while it continues to traverse deeper along the  path condition under the conservative search strategy which possiblely leads to more time but higher coverages on the benchmarks .
 
