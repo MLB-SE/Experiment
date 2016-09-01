@@ -1,0 +1,7 @@
+@include ../common-jpf.properties
+
+target =JpfTargetNewtonSimpson
+symbolic.method = scic.NewtonSimpson.newton(sym#sym)
+
+symbolic.max_pc_length = 5
+search.depth_limit =4

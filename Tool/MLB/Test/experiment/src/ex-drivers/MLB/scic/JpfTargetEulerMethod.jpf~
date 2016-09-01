@@ -1,0 +1,3 @@
+target =JpfTargetEulerMethod
+symbolic.method = scic.EulerMethod.euler(sym)
+

@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetunbounded
+symbolic.method =bound.unbounded.solve(sym#sym)

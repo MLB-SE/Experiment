@@ -1,8 +1,0 @@
-Testsuite: gov.nasa.jpf.symbc.TestBooleanSpecial1
-Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.015 sec
-
-Testcase: warning took 0.001 sec
-	FAILED
-No tests found in gov.nasa.jpf.symbc.TestBooleanSpecial1
-junit.framework.AssertionFailedError: No tests found in gov.nasa.jpf.symbc.TestBooleanSpecial1
-

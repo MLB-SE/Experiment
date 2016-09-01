@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetallinterval
+symbolic.method =bound.allinterval.solve(sym#sym#sym#sym)

@@ -1,0 +1,5 @@
+public class JpfTargetmagicseries{
+	public static void main(String[]  args){
+		color.magicseries.solve(1,1,1,1);
+	}
+}

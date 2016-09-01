@@ -1,0 +1,5 @@
+@include ../common-jpf.properties
+
+target =JpfTargetCubedRoot
+symbolic.method = scic.CubedRoot.check(sym)
+

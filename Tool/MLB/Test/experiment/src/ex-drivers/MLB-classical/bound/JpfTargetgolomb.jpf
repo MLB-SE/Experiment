@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetgolomb
+symbolic.method =bound.golomb.solve(sym#sym#sym)

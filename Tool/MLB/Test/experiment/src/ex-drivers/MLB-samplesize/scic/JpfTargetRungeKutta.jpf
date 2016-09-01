@@ -1,0 +1,6 @@
+@include ../common-jpf.properties
+
+target =JpfTargetRungeKutta
+
+symbolic.method = scic.RungeKutta.rungeKutta(sym)
+

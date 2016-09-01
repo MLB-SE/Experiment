@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetloan
+symbolic.method =color.loan.solve(sym)

@@ -36,10 +36,10 @@ Running MLB requires an environment with a Java Development Kit (JDK) supporting
 	extensions= ${jpf-core}
 
 	jpf-symbc = ${jpf.home}/jpf-symbc
-	extensions= ${jpf-symbc}
+	extensions+=, ${jpf-symbc}
 
 	jpf-nhandler = ${jpf.home}/jpf-nhandler
-	extensions= ${jpf-nhandler}
+	extensions+=, ${jpf-nhandler}
   ```
  	Note : PROJECT_DIR should be replaced by the actual root path to this repository.
     

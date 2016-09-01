@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetmagicseries2
+symbolic.method =color.magicseries.solve2(sym#sym#sym#sym)

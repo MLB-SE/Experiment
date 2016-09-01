@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetstablemarriage
+symbolic.method =color.stablemarriage.solve(sym#sym)

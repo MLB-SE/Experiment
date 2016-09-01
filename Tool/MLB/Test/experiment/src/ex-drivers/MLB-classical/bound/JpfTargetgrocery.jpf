@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetgrocery
+symbolic.method =bound.grocery.solve(sym#sym#sym#sym)

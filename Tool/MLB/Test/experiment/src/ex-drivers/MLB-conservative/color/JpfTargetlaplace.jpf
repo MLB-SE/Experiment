@@ -1,0 +1,3 @@
+@include ../common-jpf.properties
+target=JpfTargetlaplace
+symbolic.method =color.laplace.solve(sym#sym#sym#sym#sym#sym#sym#sym#sym)

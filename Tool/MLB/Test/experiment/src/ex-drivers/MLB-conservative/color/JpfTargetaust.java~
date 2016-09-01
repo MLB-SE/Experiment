@@ -1,0 +1,5 @@
+public classJpfTargetaust{
+	public static void main(String[]  args){
+		color.aust.solve(1,1,1,1,1,1,1);
+	}
+}

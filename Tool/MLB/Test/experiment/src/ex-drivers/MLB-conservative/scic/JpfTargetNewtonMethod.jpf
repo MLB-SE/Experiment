@@ -1,0 +1,7 @@
+
+@include ../common-jpf.properties
+target =JpfTargetNewtonMethod
+symbolic.method = scic.NewtonMethod.newton(sym#sym)
+
+search.depth_limit =4
+
