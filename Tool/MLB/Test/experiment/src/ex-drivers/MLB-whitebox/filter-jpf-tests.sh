@@ -28,8 +28,6 @@ if grep -q '^=\{54\} Method Summaries$' ${JPF_OUTPUT_FILE}; then
 	public class ${testClass} {
 EOF
     sed -e '0,/^=\{54\} Method Summaries$/d' \
-	-e '/UnSolved/d' \
-	-e '/[0-9]$/d' \
 	-e '/^=\{54\}/,$d' \
 	-e '/^Inputs:/d' \
 	-e '/^$/d' \

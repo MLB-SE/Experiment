@@ -50,7 +50,7 @@ Running MLB requires an environment with a Java Development Kit (JDK) supporting
     - ```symbolic.mlpm = POSITIVE_INT (default:3000)```  The sample size as the budget of the generation. Note that the running time is almost linear to the sample size which means  a larger sample size may lead to a smaller estimated false negative rate but  more time than the smaller ones .
     - ```symbolic.complex = 0 / 1 / 2 (default:2)```  The difficulty level of the problem under rough investigation. There are three preset levels: easy(0), where the function value changes slowly, e.g., x +1 = 0; modest(1), where the function value changes fast, e.g., sin(2|x|) = 0; and hard(2), where the function changes very fast, e.g., |e^x+3*e^3| = 0. 
 
-    - ```symbolic.strategy = classical / conservative (default:classical)``` The search strategy of symbolic execution. MLB backtracks when the path condition is infeasible or unsolved under the classical search strategy, while it continues to traverse deeper along the  path condition under the conservative search strategy which possiblely leads to more time but higher coverages on the benchmarks .
+    - ```symbolic.strategy = classical / ECS-Guided (default:classical)``` The search strategy of symbolic execution. MLB backtracks when the path condition is infeasible or unsolved under the classical search strategy, while it continues to traverse deeper along the  path condition under the ECS-Guided search strategy which possiblely leads to more time but higher coverages on the benchmarks .
 
 	In the ```Tool/MLB/Test/experiment``` directory, running the ```generate-test-cases.sh``` script  can  automatically generate test cases and coverage reports for programs in ```src/programs``` with  corresponding configuration files  set in ```src/drivers```.
     
@@ -59,7 +59,7 @@ Running MLB requires an environment with a Java Development Kit (JDK) supporting
 	Different experiment scripts in the ```Tool/MLB/Test/experiment``` directory  will help to reproduce the experiment data in the  evaluation.
  	- The ```run-experiments-ex.sh``` script runs the experiment to evaluate the performance of MLB for 16 real programs with a total number of 290 methods in ```src/ex-programs```   
  	-  The ```run-experiments-samples.sh``` script  runs the experiment to evaluate what influence the sample size parameter has on the performance of MLB.
- 	-  The ```run-experiments-conservative.sh``` script and  the ```run-experiment-classical.sh``` script run the experiments to evaluate the influence of different search strategies in symbolic execution on the performance.
+ 	-  The ```run-experiments-ECS-Guided.sh``` script and  the ```run-experiment-classical.sh``` script run the experiments to evaluate the influence of different search strategies in symbolic execution on the performance.
  	-   The ```run-experiments-black-box.sh``` script and  the ```run-experiments-white-box.sh``` script run the experiments to evaluate the performance of MLB for programs containing library method calls.
 
 

@@ -1,3 +1,0 @@
-@include ../common-jpf-nr.properties
-target = Testbess
-symbolic.method = bess.bessi(sym#sym);

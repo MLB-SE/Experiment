@@ -129,7 +129,7 @@
   <target name="compile-drivers"
 	  depends="compile-drivers-jpf-MLB,
 		   compile-drivers-jpf-MLB-ex,
-		   compile-drivers-jpf-MLB-conservative,
+		   compile-drivers-jpf-MLB-ECS,
 		   compile-drivers-jpf-MLB-classical,
 		   compile-drivers-jpf-MLB-whitebox,
 		   compile-drivers-jpf-MLB-blackbox,
@@ -143,8 +143,8 @@
     <foreach-program-ex-driver-set tool="MLB" target="compile-drivers" />
   </target>
 
-  <target name="compile-drivers-jpf-MLB-conservative" depends="compile-programs-ex">
-    <foreach-program-ex-driver-set tool="MLB-conservative" target="compile-drivers" />
+  <target name="compile-drivers-jpf-MLB-ECS" depends="compile-programs-ex">
+    <foreach-program-ex-driver-set tool="MLB-ECS" target="compile-drivers" />
   </target>
 
   <target name="compile-drivers-jpf-MLB-classical" depends="compile-programs-ex">
@@ -168,7 +168,7 @@
 	<target name="generate-tests" 
 		depends="generate-tests-jpf-MLB,
 			 generate-tests-jpf-MLB-ex,
-			 generate-tests-jpf-MLB-conservative,
+			 generate-tests-jpf-MLB-ECS,
 			 generate-tests-jpf-MLB-classical,
 			 generate-tests-jpf-MLB-whitebox,
 			 generate-tests-jpf-MLB-blackbox,
@@ -182,8 +182,8 @@
 		<foreach-program-ex-driver-set tool="MLB" target="generate-tests"/>
 	</target>
 
-	<target name="generate-tests-jpf-MLB-conservative" depends="compile-drivers-jpf-MLB-conservative">
-		<foreach-program-ex-driver-set tool="MLB-conservative" target="generate-tests"/>
+	<target name="generate-tests-jpf-MLB-ECS" depends="compile-drivers-jpf-MLB-ECS">
+		<foreach-program-ex-driver-set tool="MLB-ECS" target="generate-tests"/>
 	</target>
 
 	<target name="generate-tests-jpf-MLB-classical" depends="compile-drivers-jpf-MLB-classical">
@@ -228,7 +228,7 @@
   <target name="compile-tests"
 	  depends="compile-tests-jpf-MLB,
 		   compile-tests-jpf-MLB-ex,
-			 compile-tests-jpf-MLB-conservative,
+			 compile-tests-jpf-MLB-ECS,
 			 compile-tests-jpf-MLB-classical,
 			 compile-tests-jpf-MLB-whitebox,
 			 compile-tests-jpf-MLB-blackbox,
@@ -247,7 +247,7 @@
 		     target="compile-tests" />
   </target>
 
-  <target name="compile-tests-jpf-MLB-conservative">
+  <target name="compile-tests-jpf-MLB-ECS">
     <foreach-program dir="${gen.dir}/MLB"
 		     antFile="common-jpf-ex.xml"
 		     target="compile-tests" />
@@ -284,7 +284,7 @@
   <target name="run-tests"
 	  depends="run-tests-jpf-MLB,
 	  	   run-tests-jpf-MLB-ex,
-			 run-tests-jpf-MLB-conservative,
+			 run-tests-jpf-MLB-ECS,
 			 run-tests-jpf-MLB-classical,
 			 run-tests-jpf-MLB-whitebox,
 			 run-tests-jpf-MLB-blackbox,
@@ -302,7 +302,7 @@
 		     target="run-tests" />
   </target>
 
-  <target name="run-tests-jpf-MLB-conservative" depends="compile-tests-jpf-MLB-conservative">
+  <target name="run-tests-jpf-MLB-ECS" depends="compile-tests-jpf-MLB-ECS">
     <foreach-program dir="${build.tests.dir}/MLB"
 		     antFile="common-jpf-ex.xml"
 		     target="run-tests" />

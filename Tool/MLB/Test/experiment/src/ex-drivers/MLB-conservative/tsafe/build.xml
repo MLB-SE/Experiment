@@ -1,3 +1,0 @@
-<project default="generate-tests">
-  <import file="../common.xml"/>
-</project>

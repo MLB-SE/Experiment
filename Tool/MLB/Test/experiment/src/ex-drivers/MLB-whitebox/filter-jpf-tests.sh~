@@ -28,8 +28,6 @@ if grep -q '^=\{54\} Method Summaries$' ${JPF_OUTPUT_FILE}; then
 	public class ${testClass} {
 EOF
     sed -e '0,/^=\{54\} Method Summaries$/d' \
-	-e '/UnSolved/d' \
-	-e '//[0-9]$/d' \
 	-e '/^=\{54\}/,$d' \
 	-e '/^Inputs:/d' \
 	-e '/^$/d' \
@@ -41,7 +39,7 @@ EOF
 	${JPF_OUTPUT_FILE} \
     | grep -iv '\bERROR\b\|\bWARNING\b' \
     | sort -u \
-    | awk '{ if(i>5008) exit(1);printf("\n  @Test\n  public void test%i() {\n    %s\n  }\n", i, $0); i = i + 1; }' \
+    | awk '{ if(i>5000) exit(1);printf("\n  @Test\n  public void test%i() {\n %i   %s\n  }\n",i, i, $0); i = i + 1; }' \
     >> ${testFile}
     cat >> ${testFile} <<-EOF
 	}

@@ -8,8 +8,10 @@
   <property name="srcdir" location="${basedir}" />
   <property name="classdir.program"
 	    location="${build.programs.dir}/${program}" />
-
+  <property name="third.party"
+	    location="${build.programs.dir}/../../../../jpf-symbc/lib/commons-math3-3.6.jar" />
   <path id="classpath.program">
+  	<pathelement path="${third.party}" />
     <pathelement path="${classdir.program}" />
   </path>
 

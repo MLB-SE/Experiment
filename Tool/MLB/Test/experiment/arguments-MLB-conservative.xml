@@ -4,6 +4,6 @@
 					+symbolic.mltype=two
 					+symbolic.mlpm=3000
 					+symbolic.complex=2
-					+symbolic.strategy=conservative
+					+symbolic.strategy=ECS-Guided
 " />
 </project>

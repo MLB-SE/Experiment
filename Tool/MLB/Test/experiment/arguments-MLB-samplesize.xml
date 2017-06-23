@@ -7,13 +7,12 @@
 
 
 
-
 <project>
  <property name="gentestdir" location="${gen.dir}/MLB" />
   <property name="jpf.arguments" value="+symbolic.dp=CSP
 					+symbolic.mltype=two
-+symbolic.mlpm=8000
++symbolic.mlpm=6000
 +symbolic.complex=2
-					+symbolic.strategy=conservative
+					+symbolic.strategy=classical
 " />
 </project>

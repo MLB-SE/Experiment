@@ -1,3 +1,5 @@
 @include ../common-jpf-nr.properties
 target = Testbess
 symbolic.method = bess.bessi(sym#sym);
+nhandler.delegateUnhandledNative = true
+nhandler.spec.skip=java.lang.Math.getExponent;

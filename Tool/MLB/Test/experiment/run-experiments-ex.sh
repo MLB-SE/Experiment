@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NUMBER_OF_RUNS=5
+NUMBER_OF_RUNS=1
 experiment=${1:-$(date +"%y%m%d-%H%M")}
 
 function disableNonCompilingTests() {
