@@ -29,7 +29,7 @@ Running MLBSE requires an environment with a Java Development Kit (JDK) supporti
 
 - #### Set Up
 
-	Tell JPF where MLB is located by creating the ```~/.jpf/site.properties``` file with the following lines:
+	Tell JPF where MLBSE is located by creating the ```~/.jpf/site.properties``` file with the following lines:
 	```
 	jpf.home  = ${user.home}/PROJECT_DIR/Tool/MLB
 	jpf-core  = ${jpf.home}/jpf-core
@@ -46,7 +46,7 @@ Running MLBSE requires an environment with a Java Development Kit (JDK) supporti
 - #### Generate Test Cases for  Programs
 	For using SPF on a target program, a ```*.jpf``` configuration file needs to be given and the relevant information  can be found in SPF documentation. 
     
-    MLB provides the  configuration parameters as follows:
+    MLBSE provides the  configuration parameters as follows:
     - ```symbolic.mlpm = POSITIVE_INT (default:3000)```  The sample size as the budget of the generation. Note that the running time is almost linear to the sample size which means  a larger sample size may lead to a smaller estimated false negative rate but  more time than the smaller ones .
     - ```symbolic.complex = 0 / 1 / 2 (default:2)```  The difficulty level of the problem under rough investigation. There are three preset levels: easy(0), where the function value changes slowly, e.g., x +1 = 0; modest(1), where the function value changes fast, e.g., sin(2|x|) = 0; and hard(2), where the function changes very fast, e.g., |e^x+3*e^3| = 0. 
 
@@ -57,10 +57,10 @@ Running MLBSE requires an environment with a Java Development Kit (JDK) supporti
   
 - #### Reproduce The Experiments
 	Different experiment scripts in the ```Tool/MLB/Test/experiment``` directory  will help to reproduce the experiment data in the  evaluation.
- 	- The ```run-experiments-ex.sh``` script runs the experiment to evaluate the performance of MLB for 16 real programs with a total number of 290 methods in ```src/ex-programs```   
- 	-  The ```run-experiments-samples.sh``` script  runs the experiment to evaluate what influence the sample size parameter has on the performance of MLB.
+ 	- The ```run-experiments-ex.sh``` script runs the experiment to evaluate the performance of MLBSE for 19 real programs with a total number of 360 methods in ```src/ex-programs```   
+ 	-  The ```run-experiments-samples.sh``` script  runs the experiment to evaluate what influence the sample size parameter has on the performance of MLBSE.
  	-  The ```run-experiments-ECS-Guided.sh``` script and  the ```run-experiment-classical.sh``` script run the experiments to evaluate the influence of different search strategies in symbolic execution on the performance.
- 	-   The ```run-experiments-black-box.sh``` script and  the ```run-experiments-white-box.sh``` script run the experiments to evaluate the performance of MLB for programs containing library method calls.
+ 	-   The ```run-experiments-black-box.sh``` script and  the ```run-experiments-white-box.sh``` script run the experiments to evaluate the performance of MLBSE for programs containing library method calls.
 
 
 
